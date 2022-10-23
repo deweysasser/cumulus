@@ -54,8 +54,8 @@ type zone struct {
 	*route53.HostedZone
 }
 
-func (z zone) Source() string {
-	return z.Account.Name()
+func (z zone) Source() cumulus.Fielder {
+	return z.Account
 }
 
 func (z zone) Ctx() context.Context {

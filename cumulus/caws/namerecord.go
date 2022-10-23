@@ -73,7 +73,6 @@ func (r resourceRecord) Text() string {
 		aws.StringValue(r.ResourceRecordSet.Name),
 		aws.StringValue(r.ResourceRecordSet.Type),
 		r.Zone.Id().String(),
-		r.Source(),
 	}, "\t")
 }
 
@@ -90,8 +89,8 @@ func (r resourceRecord) Ctx() context.Context {
 	return r.Context
 }
 
-func (r resourceRecord) Source() string {
-	return r.Account.Name()
+func (r resourceRecord) Source() cumulus.Fielder {
+	return r.Account
 }
 
 func (r resourceRecord) Id() cumulus.ID {

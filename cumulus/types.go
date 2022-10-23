@@ -24,6 +24,7 @@ type Account interface {
 	fmt.Stringer
 	InRegion(region string) RegionalAccount
 	Name() string
+	Fielder
 	AccountInfoer
 }
 
@@ -45,10 +46,14 @@ type Fielder interface {
 	GetFields(builder IFieldBuilder)
 }
 
+type Sourcer interface {
+	Source() Fielder
+}
+
 type Common interface {
 	Texter
 	Fielder
-	Source() string
+	Sourcer
 	Ctx() context.Context
 	Text() string
 	//JSON() string

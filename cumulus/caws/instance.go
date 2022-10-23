@@ -105,8 +105,9 @@ type instance struct {
 func (i instance) Ctx() context.Context {
 	return i.ctx
 }
-func (i instance) Source() string {
-	return i.account.String()
+
+func (i instance) Source() cumulus.Fielder {
+	return i.account
 }
 
 func (i instance) Id() cumulus.ID {

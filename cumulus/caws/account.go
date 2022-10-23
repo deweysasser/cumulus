@@ -26,6 +26,10 @@ func (a Account) String() string {
 	return string(a)
 }
 
+func (a Account) GetFields(builder cumulus.IFieldBuilder) {
+	builder.Where("account_name", string(a))
+}
+
 func (a Account) session() (*session.Session, error) {
 	//logger := log.With().Str("profile", string(a)).Str("region", profile.region).Logger()
 
@@ -62,6 +66,11 @@ func (a RegionalAccount) String() string {
 	return fmt.Sprint(a.Account, "/", a.region)
 }
 
+func (a RegionalAccount) GetFields(builder cumulus.IFieldBuilder) {
+	a.Account.GetFields(builder)
+	builder.Where("region", a.region)
+}
+
 func (a RegionalAccount) Region() string {
 	return a.region
 }
@@ -69,7 +78,7 @@ func (a RegionalAccount) Region() string {
 func (a RegionalAccount) session() (*session.Session, error) {
 	//logger := log.With().Str("profile", string(a)).Str("region", profile.region).Logger()
 
-	if s, err := session.NewSessionWithOptions(session.Options{Profile: string(a.Account), Config: aws.Config{Region: aws.String(a.region)}}); err == nil {
+	if s, err := session.NewSessionWithOptions(session.Options{Profile: a.Account.Name(), Config: aws.Config{Region: aws.String(a.region)}}); err == nil {
 		return s, nil
 	} else {
 		log.Error().Err(err).Msg("Failed to create session")

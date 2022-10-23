@@ -94,6 +94,12 @@ type Filter interface {
 func (acc *FieldsAccumulator) Add(fielder Fielder) {
 	b := NewBuilder()
 	fielder.GetFields(b)
+
+	// If we can find a source, also get the fields there
+	if s, ok := fielder.(Sourcer); ok {
+		s.Source().GetFields(b)
+	}
+
 	fields := b.Fields
 
 	m := make(map[string]string)

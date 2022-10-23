@@ -90,8 +90,8 @@ func (a accountInfo) Account() cumulus.Account {
 	return a.account
 }
 
-func (a accountInfo) Source() string {
-	return string(a.account)
+func (a accountInfo) Source() cumulus.Fielder {
+	return a.account
 }
 
 func (a accountInfo) Ctx() context.Context {

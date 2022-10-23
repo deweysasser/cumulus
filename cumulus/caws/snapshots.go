@@ -73,8 +73,8 @@ type snapshot struct {
 	RegionalAccount
 }
 
-func (i snapshot) Source() string {
-	return i.RegionalAccount.String()
+func (i snapshot) Source() cumulus.Fielder {
+	return i.RegionalAccount
 }
 
 func (i snapshot) Ctx() context.Context {
