@@ -13,7 +13,7 @@ type List struct {
 }
 
 func (list *List) Run() error {
-	return doAccountList[cumulus.AccountInfo](&list.CommonList,
+	return listOnAccounts[cumulus.AccountInfo](&list.CommonList,
 		cumulus.Accounts.AccountInfos,
 		"AccountInfo")
 }

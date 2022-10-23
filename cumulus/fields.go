@@ -11,8 +11,7 @@ import (
 type FieldType int
 
 const (
-	LUID FieldType = iota
-	WUID
+	GID FieldType = iota
 	Name
 	WHO
 	WHAT
@@ -20,6 +19,7 @@ const (
 	WHERE
 	WHY
 	HOW
+	TAG
 )
 
 type FieldMeta struct {
@@ -68,6 +68,10 @@ func NewAccumulator() FieldsAccumulator {
 	}
 }
 
+type Filter interface {
+	Accept(meta FieldMeta) bool
+}
+
 func (acc *FieldsAccumulator) Add(fields Fields) {
 	m := make(map[string]string)
 	for _, f := range fields {
@@ -91,19 +95,30 @@ func (acc *FieldsAccumulator) Fields() []FieldMeta {
 	return fields
 }
 
-func (acc *FieldsAccumulator) Print() {
+func (acc *FieldsAccumulator) Print(f Filter) {
 	padding := 3
 	fields := acc.Fields()
+	// TODO:  put the title in only when we're verbose
+
+	printFields := make([]FieldMeta, 0)
+
 	for _, field := range fields {
-		name := strings.ToUpper(field.Name)
-		name = strings.Replace(name, "_", " ", -1)
+		if !f.Accept(field) {
+			continue
+		}
+		printFields = append(printFields, field)
+
+		name := strings.Replace(field.Name, "_", " ", -1)
+
+		acc.lengths[field.Name] = max(acc.lengths[field.Name], len(name))
 
 		fmt.Printf("%-*s", acc.lengths[field.Name]+padding, name)
 	}
 	fmt.Println()
 
 	for _, line := range acc.Lines {
-		for _, field := range fields {
+		for _, field := range printFields {
+
 			s := line[field.Name]
 			switch {
 			case s == "":
@@ -212,10 +227,10 @@ func (f *FieldBuilder) Why(name, value string) *FieldBuilder {
 	return f
 }
 
-func (f *FieldBuilder) LUID(value string) *FieldBuilder {
+func (f *FieldBuilder) GID(value string) *FieldBuilder {
 	f.Fields = append(f.Fields, Field{
 		FieldMeta: FieldMeta{
-			Kind: LUID,
+			Kind: GID,
 			Name: "ID",
 		},
 
@@ -238,11 +253,11 @@ func (f *FieldBuilder) Name(value string) *FieldBuilder {
 	return f
 }
 
-func (f *FieldBuilder) WUID(value string) *FieldBuilder {
+func (f *FieldBuilder) Tag(name, value string) *FieldBuilder {
 	f.Fields = append(f.Fields, Field{
 		FieldMeta: FieldMeta{
-			Kind: WUID,
-			Name: "WUID",
+			Kind: TAG,
+			Name: "tag:" + name,
 		},
 
 		Value: value,

@@ -41,9 +41,13 @@ type Texter interface {
 	Text() string
 }
 
+type Fielder interface {
+	Fields() Fields
+}
+
 type Common interface {
 	Texter
-	Fields() Fields
+	Fielder
 	Source() string
 	Ctx() context.Context
 	Text() string

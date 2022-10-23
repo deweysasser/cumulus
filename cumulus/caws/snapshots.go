@@ -139,7 +139,7 @@ func (i snapshot) Fields() cumulus.Fields {
 	}
 
 	return cumulus.NewBuilder().
-		WUID(aws.StringValue(i.SnapshotId)).
+		GID(aws.StringValue(i.SnapshotId)).
 		Name(name).
 		What("size", fmt.Sprint(aws.Int64Value(i.Snapshot.VolumeSize), "G")).
 		When("start_time", aws.TimeValue(i.Snapshot.StartTime)).

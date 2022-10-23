@@ -100,7 +100,7 @@ func (z zone) Fields() cumulus.Fields {
 	}
 
 	return cumulus.NewBuilder().
-		WUID(aws.StringValue(z.HostedZone.Id)).
+		GID(aws.StringValue(z.HostedZone.Id)).
 		Name(aws.StringValue(z.HostedZone.Name)).
 		What("type", zonetype).
 		Fields

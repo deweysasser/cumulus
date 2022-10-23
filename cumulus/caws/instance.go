@@ -146,24 +146,24 @@ func (i instance) Text() string {
 }
 
 func (i instance) Fields() cumulus.Fields {
-	name := ""
-	for _, t := range i.Tags {
-		if aws.StringValue(t.Key) == "Name" {
-			name = aws.StringValue(t.Value)
-			break
-		}
-	}
 
-	return cumulus.NewBuilder().
-		WUID(aws.StringValue(i.InstanceId)).
+	b := cumulus.NewBuilder().
+		GID(aws.StringValue(i.InstanceId)).
 		What("type", aws.StringValue(i.InstanceType)).
 		Where("private_dns", aws.StringValue(i.PrivateDnsName)).
 		Where("private_ip", aws.StringValue(i.PrivateIpAddress)).
 		Where("public_dns", aws.StringValue(i.PublicDnsName)).
-		Where("public_ip", aws.StringValue(i.PublicIpAddress)).
-		Name(name).
-		Fields
+		Where("public_ip", aws.StringValue(i.PublicIpAddress))
 
+	for _, t := range i.Tags {
+		if aws.StringValue(t.Key) == "Name" {
+			b.Name(aws.StringValue(t.Value))
+		} else {
+			b.Tag(aws.StringValue(t.Key), aws.StringValue(t.Value))
+		}
+	}
+
+	return b.Fields
 }
 
 func fieldValue(s *string) string {

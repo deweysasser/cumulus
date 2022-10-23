@@ -18,7 +18,7 @@ type ZoneList struct {
 }
 
 func (list *ZoneList) Run() error {
-	return doAccountList[cumulus.Zone](&list.CommonList,
+	return listOnAccounts[cumulus.Zone](&list.CommonList,
 		cumulus.Accounts.Zones,
 		"Zone")
 }
@@ -32,7 +32,7 @@ type RecordList struct {
 }
 
 func (list *RecordList) Run() error {
-	return doAccountList[cumulus.NameRecord](&list.CommonList,
+	return listOnAccounts[cumulus.NameRecord](&list.CommonList,
 		cumulus.Accounts.NameRecords,
 		"NameRecord")
 }

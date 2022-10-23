@@ -13,7 +13,7 @@ type InstanceList struct {
 }
 
 func (list *InstanceList) Run() error {
-	return doList[cumulus.Instance](&list.CommonList,
+	return listOnRegionalAccounts[cumulus.Instance](&list.CommonList,
 		cumulus.RegionalAccounts.Instances,
 		"instance")
 }

@@ -13,7 +13,7 @@ type SnapshotList struct {
 }
 
 func (list *SnapshotList) Run() error {
-	return doList[cumulus.Snapshot](&list.CommonList,
+	return listOnRegionalAccounts[cumulus.Snapshot](&list.CommonList,
 		cumulus.RegionalAccounts.Snapshots,
 		"snapshot")
 }
