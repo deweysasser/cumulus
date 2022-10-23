@@ -31,7 +31,6 @@ type Account interface {
 type Accounts []Account
 
 type RegionalAccount interface {
-	fmt.Stringer
 	Account
 	Region() string
 }

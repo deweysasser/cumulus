@@ -46,32 +46,53 @@ type FieldMeta struct {
 	DefaultHidden bool
 }
 
-type Field struct {
-	FieldMeta
-	Value string
+type FieldValue struct {
+	Values []string
 }
 
-type Fields []Field
-
-func (fields Fields) String() string {
-	sort.Slice(fields, func(i, j int) bool {
-		return fields[i].Kind < fields[j].Kind
-	})
-
-	s := make([]string, len(fields))
-
-	for i, f := range fields {
-		s[i] = f.Value
-		if f.Value == "" {
-			s[i] = "-"
-		}
-		if strings.Contains(f.Value, " ") {
-			s[i] = "\"" + f.Value + "\""
-		}
+func (f FieldValue) String() string {
+	switch {
+	case f.Values == nil:
+		return ""
+	case len(f.Values) < 1:
+		return ""
+	case len(f.Values) == 1:
+		return f.Values[0]
+	default:
+		return strings.Join(f.Values, ", ")
 	}
-
-	return strings.Join(s, "\t")
 }
+
+func fValue(s string) FieldValue {
+	return FieldValue{Values: []string{s}}
+}
+
+func (f *FieldValue) Add(s string) {
+	f.Values = append(f.Values, s)
+}
+
+type Fields map[FieldMeta]FieldValue
+
+//
+//func (fields Fields) String() string {
+//	sort.Slice(fields, func(i, j int) bool {
+//		return fields[i].Kind < fields[j].Kind
+//	})
+//
+//	s := make([]string, len(fields))
+//
+//	for i, f := range fields {
+//		s[i] = f.Value
+//		if f.Value == "" {
+//			s[i] = "-"
+//		}
+//		if strings.Contains(f.Value, " ") {
+//			s[i] = "\"" + f.Value + "\""
+//		}
+//	}
+//
+//	return strings.Join(s, "\t")
+//}
 
 type FieldsAccumulator struct {
 	Lines   []map[string]string
@@ -103,10 +124,11 @@ func (acc *FieldsAccumulator) Add(fielder Fielder) {
 	fields := b.Fields
 
 	m := make(map[string]string)
-	for _, f := range fields {
-		acc.fields.Add(f.FieldMeta)
-		acc.lengths[f.Name] = max(acc.lengths[f.Name], len(f.Value))
-		m[f.Name] = f.Value
+	for k, v := range fields {
+		acc.fields.Add(k)
+		s := v.String()
+		acc.lengths[k.Name] = max(acc.lengths[k.Name], len(s))
+		m[k.Name] = s
 	}
 
 	acc.Lines = append(acc.Lines, m)

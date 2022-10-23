@@ -20,9 +20,19 @@ type FieldBuilder struct {
 	Fields Fields
 }
 
+func (f *FieldBuilder) Add(meta FieldMeta, value string) *FieldBuilder {
+	if v, ok := f.Fields[meta]; ok {
+		v.Add(value)
+	} else {
+		f.Fields[meta] = fValue(value)
+	}
+
+	return f
+}
+
 func NewBuilder() *FieldBuilder {
 	return &FieldBuilder{
-		Fields: make([]Field, 0),
+		Fields: make(Fields),
 	}
 }
 
@@ -31,119 +41,79 @@ func (f *FieldBuilder) Done() {
 }
 
 func (f *FieldBuilder) Who(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHO,
-			Name: name,
-		},
-		Value: value,
-	})
-
-	return f
+	meta := FieldMeta{
+		Kind: WHO,
+		Name: name,
+	}
+	return f.Add(meta, value)
 }
 
 func (f *FieldBuilder) What(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHAT,
-			Name: name,
-		},
-
-		Value: value,
-	})
-
-	return f
+	meta := FieldMeta{
+		Kind: WHAT,
+		Name: name,
+	}
+	return f.Add(meta, value)
 }
 
 func (f *FieldBuilder) Where(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHERE,
-			Name: name,
-		},
-
-		Value: value,
-	})
-
-	return f
+	meta := FieldMeta{
+		Kind: WHERE,
+		Name: name,
+	}
+	return f.Add(meta, value)
 }
 
 func (f *FieldBuilder) When(name string, t time.Time) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHEN,
-			Name: name,
-		},
+	meta := FieldMeta{
+		Kind: WHEN,
+		Name: name,
+	}
 
-		Value: t.String(),
-	})
-
-	return f
+	return f.Add(meta, t.String())
 }
 
 func (f *FieldBuilder) How(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: HOW,
-			Name: name,
-		},
+	meta := FieldMeta{
+		Kind: HOW,
+		Name: name,
+	}
 
-		Value: value,
-	})
-
-	return f
+	return f.Add(meta, value)
 }
 
 func (f *FieldBuilder) Why(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHY,
-			Name: name,
-		},
+	meta := FieldMeta{
+		Kind: WHY,
+		Name: name,
+	}
+	return f.Add(meta, value)
 
-		Value: value,
-	})
-
-	return f
 }
 
 func (f *FieldBuilder) GID(value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: IDMeta,
-		Value:     value,
-	})
+	meta := IDMeta
+	return f.Add(meta, value)
 
-	return f
 }
 
 func (f *FieldBuilder) Name(value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: NameMeta,
-		Value:     value,
-	})
+	meta := NameMeta
+	return f.Add(meta, value)
 
-	return f
 }
 
 func (f *FieldBuilder) Description(value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: DescriptionMeta,
-		Value:     value,
-	})
+	meta := DescriptionMeta
+	return f.Add(meta, value)
 
-	return f
 }
 
 func (f *FieldBuilder) Tag(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind:          TAG,
-			Name:          "tag:" + name,
-			DefaultHidden: true,
-		},
-
-		Value: value,
-	})
-
-	return f
+	meta := FieldMeta{
+		Kind:          TAG,
+		Name:          "tag:" + name,
+		DefaultHidden: true,
+	}
+	return f.Add(meta, value)
 }
