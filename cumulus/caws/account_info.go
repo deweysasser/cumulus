@@ -43,7 +43,6 @@ func (a Account) AccountInfos(ctx context.Context) chan cumulus.AccountInfo {
 
 		log = log.With().Str("account_id", aws.StringValue(out.Account)).Logger()
 
-		log.Debug().Msg("Sending results")
 		results <- &accountInfo{
 			account:                 a,
 			GetCallerIdentityOutput: out,

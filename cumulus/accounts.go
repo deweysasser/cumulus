@@ -42,14 +42,27 @@ func (a Accounts) Unique(ctx context.Context) Accounts {
 
 	log.Debug().Msg("finding unique accounts")
 
+	infos := make(map[Account]AccountInfo)
+
 	for info := range a.AccountInfos(ctx) {
-		//log := zerolog.Ctx(info.Ctx())
-		if !seen[info.ID()] {
-			seen[info.ID()] = true
-			unique = append(unique, info.Account())
-			//log.Debug().Str("id", info.ID()).Str("source", info.Source()).Msg("unique: using account")
+		infos[info.Account()] = info
+	}
+
+	for _, a := range a {
+		log.Debug().Str("account", a.Name()).Msg("Checking account")
+
+		if info, ok := infos[a]; ok {
+			log := zerolog.Ctx(info.Ctx())
+
+			if !seen[info.ID()] {
+				seen[info.ID()] = true
+				unique = append(unique, info.Account())
+				log.Debug().Str("id", info.ID()).Msg("unique: using account")
+			} else {
+				log.Debug().Str("id", info.ID()).Msg("unique: ignoring duplicate account")
+			}
 		} else {
-			//log.Debug().Str("id", info.ID()).Str("source", info.Source()).Msg("unique: ignoring duplicate account")
+			log.Debug().Str("account", a.Name()).Msg("No info for account")
 		}
 	}
 
