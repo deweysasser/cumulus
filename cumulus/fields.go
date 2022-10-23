@@ -47,31 +47,41 @@ type FieldMeta struct {
 }
 
 type FieldValue struct {
-	Values []string
+	Values set.Set[string]
 }
 
 func (f FieldValue) String() string {
-	switch {
-	case f.Values == nil:
-		return ""
-	case len(f.Values) < 1:
-		return ""
-	case len(f.Values) == 1:
-		return f.Values[0]
-	default:
-		return strings.Join(f.Values, ", ")
+	//switch {
+	//case f.Values == nil:
+	//	return ""
+	//case f.Values.Cardinality() < 1:
+	//	return ""
+	//case f.Values.Cardinality() == 1:
+	//	c := f.Values.Iter()
+	//	defer close(c)
+	//	return <-c
+	//default:
+	//	return strings.Join(f.Values, ", ")
+	//}
+	// TODO: this probably puts more weight on the GC than we need, and copies stuff unnecessarily
+	return strings.Join(f.Values.ToSlice(), ", ")
+}
+
+func fValue(s string) *FieldValue {
+	if s != "" {
+		return &FieldValue{Values: set.NewThreadUnsafeSet[string](s)}
+	} else {
+		return &FieldValue{Values: set.NewThreadUnsafeSet[string]()}
 	}
 }
 
-func fValue(s string) FieldValue {
-	return FieldValue{Values: []string{s}}
-}
-
 func (f *FieldValue) Add(s string) {
-	f.Values = append(f.Values, s)
+	if s != "" {
+		f.Values.Add(s)
+	}
 }
 
-type Fields map[FieldMeta]FieldValue
+type Fields map[FieldMeta]*FieldValue
 
 //
 //func (fields Fields) String() string {
