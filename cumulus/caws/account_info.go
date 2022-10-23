@@ -55,30 +55,6 @@ func (a Account) AccountInfos(ctx context.Context) chan cumulus.AccountInfo {
 	return results
 }
 
-func (a Account) VisitAccountInfo(ctx context.Context, visitor cumulus.AccountInfoVisitor) error {
-
-	s, e := a.session()
-	if e != nil {
-		return e
-	}
-
-	svc := sts.New(s)
-
-	start := time.Now()
-	out, err := svc.GetCallerIdentity(&sts.GetCallerIdentityInput{})
-	CallTimer.Done(start)
-
-	if err != nil {
-		return e
-	}
-
-	return visitor(ctx, accountInfo{
-		account:                 a,
-		ctx:                     ctx,
-		GetCallerIdentityOutput: out,
-	})
-}
-
 type accountInfo struct {
 	account Account
 	*sts.GetCallerIdentityOutput

@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/deweysasser/cumulus/cumulus"
-	"github.com/hashicorp/go-multierror"
 	"github.com/rs/zerolog/log"
 	"strings"
 	"time"
@@ -56,44 +55,6 @@ func (a RegionalAccount) Instances(ctx context.Context) chan cumulus.Instance {
 		}
 	}()
 	return result
-}
-
-func (a RegionalAccount) VisitInstance(ctx context.Context, cancel context.CancelFunc, visitor cumulus.InstanceVisitor) error {
-
-	s, e := a.session()
-	if e != nil {
-		return e
-	}
-
-	fmt.Sprint("Logger should print next")
-
-	svc := ec2.New(s)
-
-	a.Read.Wait(ctx)
-	start := time.Now()
-	instances, err := svc.DescribeInstancesWithContext(ctx, &ec2.DescribeInstancesInput{})
-	CallTimer.Done(start)
-
-	if err != nil {
-		return e
-	}
-
-	for _, r := range instances.Reservations {
-		for _, i := range r.Instances {
-			select {
-			case <-ctx.Done():
-				return err
-			default:
-				l := log.Ctx(ctx).With().Str("instance_id", aws.StringValue(i.InstanceId)).Logger()
-				err = multierror.Append(err,
-					visitor(
-						l.WithContext(ctx),
-						cancel,
-						instance{a, ctx, i}))
-			}
-		}
-	}
-	return err
 }
 
 type instance struct {
