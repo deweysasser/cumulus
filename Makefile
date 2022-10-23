@@ -6,7 +6,7 @@ EXE=
 endif
 
 BASENAME=$(notdir $(shell pwd))
-PROGRAM=$(BASENAME)$(EXE)
+PROGRAM=bulk-cloud$(EXE)
 LAST_RELEASE=
 
 REPO=$(shell go list | head -n 1)
@@ -20,11 +20,15 @@ all: $(PROGRAM)
 
 compile: $(PROGRAM)
 
-$(PROGRAM):
+$(PROGRAM): generate
 	go build -ldflags="-X '$(REPO)/program.Version=${VERSION}'" -o $(PROGRAM)
 
-install:
+install: generate
 	go install -ldflags="-X '$(REPO)/program.Version=${VERSION}'"
+
+generate:
+	go generate ./...
+	go fmt ./...
 
 
 image: Dockerfile
