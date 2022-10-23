@@ -12,7 +12,7 @@ type SnapshotList struct {
 	CommonList `embed:""`
 }
 
-func (list *SnapshotList) Run() error {
+func (list *SnapshotList) Run(program *Options) error {
 	return listOnRegionalAccounts[cumulus.Snapshot](&list.CommonList,
 		cumulus.RegionalAccounts.Snapshots,
 		"snapshot")

@@ -42,7 +42,7 @@ type Texter interface {
 }
 
 type Fielder interface {
-	Fields() Fields
+	GetFields(builder IFieldBuilder)
 }
 
 type Common interface {

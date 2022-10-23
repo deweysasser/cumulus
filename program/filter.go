@@ -11,7 +11,7 @@ type Filter struct {
 }
 
 var NoFilter = &Filter{
-	Include: []*regexp.Regexp{},
+	Include: []*regexp.Regexp{regexp.MustCompile(".*")},
 	Exclude: []*regexp.Regexp{},
 }
 
@@ -39,16 +39,19 @@ func NewFilter(include, exclude []string) *Filter {
 }
 
 func (f *Filter) Accept(meta cumulus.FieldMeta) bool {
+	log := log.With().Str("fieldname", meta.Name).Logger()
+
 	if len(f.Include) > 0 {
+		log.Debug().Msg("Has includes")
 		for _, r := range f.Include {
 			if r.MatchString(meta.Name) {
 				return true
 			}
 		}
-		return false
 	}
 
 	if len(f.Exclude) > 0 {
+		log.Debug().Msg("Has excludes")
 		for _, r := range f.Exclude {
 			if r.MatchString(meta.Name) {
 				return false
@@ -57,5 +60,7 @@ func (f *Filter) Accept(meta cumulus.FieldMeta) bool {
 		return true
 	}
 
-	return true
+	log.Debug().Bool("hidden", meta.DefaultHidden).Msg("returning default decision")
+
+	return !meta.DefaultHidden
 }

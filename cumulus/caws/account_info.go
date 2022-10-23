@@ -110,11 +110,11 @@ func (a accountInfo) Text() string {
 	return a.Name()
 }
 
-func (a accountInfo) Fields() cumulus.Fields {
-	return cumulus.NewBuilder().
+func (a accountInfo) GetFields(builder cumulus.IFieldBuilder) {
+	builder.
 		Name(a.Name()).
 		GID(aws.StringValue(a.Arn)).
 		Who("account_id", aws.StringValue(a.GetCallerIdentityOutput.Account)).
 		How("user_id", aws.StringValue(a.GetCallerIdentityOutput.UserId)).
-		Fields
+		Done()
 }

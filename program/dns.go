@@ -17,7 +17,7 @@ type ZoneList struct {
 	CommonList `embed:""`
 }
 
-func (list *ZoneList) Run() error {
+func (list *ZoneList) Run(program *Options) error {
 	return listOnAccounts[cumulus.Zone](&list.CommonList,
 		cumulus.Accounts.Zones,
 		"Zone")
@@ -31,7 +31,7 @@ type RecordList struct {
 	CommonList `embed:""`
 }
 
-func (list *RecordList) Run() error {
+func (list *RecordList) Run(program *Options) error {
 	return listOnAccounts[cumulus.NameRecord](&list.CommonList,
 		cumulus.Accounts.NameRecords,
 		"NameRecord")

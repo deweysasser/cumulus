@@ -18,10 +18,35 @@ type Texter interface {
 
 type CommonList struct {
 	CredentialsFile string   `group:"AWS" short:"c" help:"AWS Credentials File" type:"existingfile" default:"~/.aws/credentials"`
-	Fields          []string `group:"Output" short:"i" help:"List of field regexps to include"`
-	Exclude         []string `group:"Output" short:"x" help:"List of fields regexps to exclude" default:"tag:.*"`
+	Include         []string `group:"Output" short:"I" help:"List of field regexps to include"`
+	Exclude         []string `group:"Output" short:"X" help:"List of fields regexps to exclude"`
 	IncludeAll      bool     `group:"Output" short:"A" help:"Include all fields"`
+
 	// TODO:  support a "fields" list to specify the membership and order of the fields printed
+}
+
+func Display[T cumulus.Common](list *CommonList, typename string, items chan T) {
+	var count atomic.Int32
+	defer func() {
+		log.Info().Int32("count", count.Load()).Msg("discovered " + typename)
+		stats.Report()
+		stats.Total()
+	}()
+
+	var f *Filter
+	if list.IncludeAll {
+		log.Debug().Msg("Including all fields.  Removing filter")
+		f = NoFilter
+	} else {
+		f = NewFilter(list.Include, list.Exclude)
+	}
+
+	acc := cumulus.NewAccumulator()
+	for info := range items {
+		count.Add(1)
+		acc.Add(info)
+	}
+	acc.Print(f)
 }
 
 func listOnRegionalAccounts[T cumulus.Common](list *CommonList, method func(account cumulus.RegionalAccounts, ctx context.Context) chan T, typename string) error {
@@ -41,35 +66,16 @@ func listOnRegionalAccounts[T cumulus.Common](list *CommonList, method func(acco
 	if len(ra) == 0 {
 		return errors.New("No accounts discovered")
 	}
-	log.Debug().Str("ras", fmt.Sprint(ra)).Msg("Using accounts")
 
 	collectedErrors := cumulus.ErrorCollector{}
 	ctx := cumulus.WithErrorHandler(context.Background(), collectedErrors.Handle)
 
-	var count atomic.Int32
-	defer func() {
-		log.Info().Int32("count", count.Load()).Msg("discovered " + typename)
-		stats.Report()
-		stats.Total()
-	}()
-
+	log.Debug().Str("ras", fmt.Sprint(ra)).Msg("Using accounts")
+	log.Debug().Msg("Listing all " + typename)
 	items := method(ra, ctx)
 
-	Display(list, typename, items, count)
+	Display(list, typename, items)
 	return collectedErrors.Error
-
-}
-
-func Display[T cumulus.Common](list *CommonList, typename string, items chan T, count atomic.Int32) {
-	f := NewFilter(list.Fields, list.Exclude)
-
-	log.Debug().Msg("Listing all " + typename)
-	acc := cumulus.NewAccumulator()
-	for info := range items {
-		count.Add(1)
-		acc.Add(info.Fields())
-	}
-	acc.Print(f)
 }
 
 func listOnAccounts[T cumulus.Common](list *CommonList, method func(account cumulus.Accounts, ctx context.Context) chan T, typename string) error {
@@ -95,15 +101,10 @@ func listOnAccounts[T cumulus.Common](list *CommonList, method func(account cumu
 	ctx := cumulus.WithErrorHandler(context.Background(), errors.Handle)
 
 	log.Debug().Str("ras", fmt.Sprint(ra)).Msg("Using accounts")
-	var count atomic.Int32
-	defer func() {
-		log.Info().Int32("count", count.Load()).Msg("discovered " + typename)
-		stats.Report()
-		stats.Total()
-	}()
+	log.Debug().Msg("Listing all " + typename)
 
 	items := method(ra, ctx)
 
-	Display(list, typename, items, count)
+	Display(list, typename, items)
 	return errors.Error
 }

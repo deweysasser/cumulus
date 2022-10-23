@@ -77,13 +77,13 @@ func (r resourceRecord) Text() string {
 	}, "\t")
 }
 
-func (r resourceRecord) Fields() cumulus.Fields {
-	return cumulus.NewBuilder().
+func (r resourceRecord) GetFields(builder cumulus.IFieldBuilder) {
+	builder.
 		Name(aws.StringValue(r.ResourceRecordSet.Name)).
 		What("record_type", aws.StringValue(r.ResourceRecordSet.Type)).
 		Where("zone_id", r.Zone.Id().String()).
 		Where("account", r.Account.Name()).
-		Fields
+		Done()
 }
 
 func (r resourceRecord) Ctx() context.Context {

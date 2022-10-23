@@ -91,17 +91,16 @@ func (z zone) Text() string {
 	}, "\t")
 }
 
-func (z zone) Fields() cumulus.Fields {
-
-	zonetype := "public"
+func (z zone) GetFields(builder cumulus.IFieldBuilder) {
 
 	if aws.BoolValue(z.HostedZone.Config.PrivateZone) {
-		zonetype = "private"
+		builder.What("type", "private")
+	} else {
+		builder.What("type", "public")
 	}
 
-	return cumulus.NewBuilder().
+	builder.
 		GID(aws.StringValue(z.HostedZone.Id)).
 		Name(aws.StringValue(z.HostedZone.Name)).
-		What("type", zonetype).
-		Fields
+		Done()
 }

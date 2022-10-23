@@ -128,21 +128,19 @@ func (i snapshot) Text() string {
 	)
 }
 
-func (i snapshot) Fields() cumulus.Fields {
+func (i snapshot) GetFields(builder cumulus.IFieldBuilder) {
 
-	name := ""
-	for _, t := range i.Tags {
-		if aws.StringValue(t.Key) == "Name" {
-			name = aws.StringValue(t.Value)
-			break
-		}
-	}
-
-	return cumulus.NewBuilder().
+	builder.
 		GID(aws.StringValue(i.SnapshotId)).
-		Name(name).
 		What("size", fmt.Sprint(aws.Int64Value(i.Snapshot.VolumeSize), "G")).
 		When("start_time", aws.TimeValue(i.Snapshot.StartTime)).
-		What("description", aws.StringValue(i.Description)).
-		Fields
+		Description(aws.StringValue(i.Description))
+
+	for _, t := range i.Tags {
+		if aws.StringValue(t.Key) == "Name" {
+			builder.Name(aws.StringValue(t.Value))
+		} else {
+			builder.Tag(aws.StringValue(t.Key), aws.StringValue(t.Value))
+		}
+	}
 }

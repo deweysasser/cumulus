@@ -12,8 +12,9 @@ type InstanceList struct {
 	CommonList `embed:""`
 }
 
-func (list *InstanceList) Run() error {
-	return listOnRegionalAccounts[cumulus.Instance](&list.CommonList,
+func (list *InstanceList) Run(program Options) error {
+	return listOnRegionalAccounts[cumulus.Instance](
+		&list.CommonList,
 		cumulus.RegionalAccounts.Instances,
 		"instance")
 }

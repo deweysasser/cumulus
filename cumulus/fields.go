@@ -5,26 +5,45 @@ import (
 	set "github.com/deckarep/golang-set/v2"
 	"sort"
 	"strings"
-	"time"
 )
 
 type FieldType int
 
 const (
 	GID FieldType = iota
-	Name
+	NAME
 	WHO
 	WHAT
 	WHEN
 	WHERE
 	WHY
 	HOW
+	DESCRIPTION
 	TAG
 )
 
+var (
+	DescriptionMeta = FieldMeta{
+		Kind:          DESCRIPTION,
+		Name:          "description",
+		DefaultHidden: true,
+	}
+
+	NameMeta = FieldMeta{
+		Kind: NAME,
+		Name: "name",
+	}
+
+	IDMeta = FieldMeta{
+		Kind: GID,
+		Name: "ID",
+	}
+)
+
 type FieldMeta struct {
-	Kind FieldType
-	Name string
+	Kind          FieldType
+	Name          string
+	DefaultHidden bool
 }
 
 type Field struct {
@@ -72,7 +91,11 @@ type Filter interface {
 	Accept(meta FieldMeta) bool
 }
 
-func (acc *FieldsAccumulator) Add(fields Fields) {
+func (acc *FieldsAccumulator) Add(fielder Fielder) {
+	b := NewBuilder()
+	fielder.GetFields(b)
+	fields := b.Fields
+
 	m := make(map[string]string)
 	for _, f := range fields {
 		acc.fields.Add(f.FieldMeta)
@@ -108,7 +131,9 @@ func (acc *FieldsAccumulator) Print(f Filter) {
 		}
 		printFields = append(printFields, field)
 
-		name := strings.Replace(field.Name, "_", " ", -1)
+		//name := strings.Replace(field.Name, "_", " ", -1)
+
+		name := field.Name
 
 		acc.lengths[field.Name] = max(acc.lengths[field.Name], len(name))
 
@@ -138,130 +163,4 @@ func max(i, j int) int {
 		return i
 	}
 	return j
-}
-
-func NewBuilder() *FieldBuilder {
-	return &FieldBuilder{
-		Fields: make([]Field, 0),
-	}
-}
-
-type FieldBuilder struct {
-	Fields Fields
-}
-
-func (f *FieldBuilder) Who(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHO,
-			Name: name,
-		},
-		Value: value,
-	})
-
-	return f
-}
-
-func (f *FieldBuilder) What(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHAT,
-			Name: name,
-		},
-
-		Value: value,
-	})
-
-	return f
-}
-
-func (f *FieldBuilder) Where(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHERE,
-			Name: name,
-		},
-
-		Value: value,
-	})
-
-	return f
-}
-
-func (f *FieldBuilder) When(name string, t time.Time) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHEN,
-			Name: name,
-		},
-
-		Value: t.String(),
-	})
-
-	return f
-}
-
-func (f *FieldBuilder) How(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: HOW,
-			Name: name,
-		},
-
-		Value: value,
-	})
-
-	return f
-}
-
-func (f *FieldBuilder) Why(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: WHY,
-			Name: name,
-		},
-
-		Value: value,
-	})
-
-	return f
-}
-
-func (f *FieldBuilder) GID(value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: GID,
-			Name: "ID",
-		},
-
-		Value: value,
-	})
-
-	return f
-}
-
-func (f *FieldBuilder) Name(value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: Name,
-			Name: "name",
-		},
-
-		Value: value,
-	})
-
-	return f
-}
-
-func (f *FieldBuilder) Tag(name, value string) *FieldBuilder {
-	f.Fields = append(f.Fields, Field{
-		FieldMeta: FieldMeta{
-			Kind: TAG,
-			Name: "tag:" + name,
-		},
-
-		Value: value,
-	})
-
-	return f
 }
