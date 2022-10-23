@@ -5,8 +5,56 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/deweysasser/golang-program/cumulus"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"time"
 )
+
+func (a Account) AccountInfos(ctx context.Context) chan cumulus.AccountInfo {
+	results := make(chan cumulus.AccountInfo)
+
+	go func() {
+
+		l := zerolog.Ctx(ctx)
+
+		log := l.With().Str("account", string(a)).Logger()
+
+		log.Debug().Msg("Getting account info")
+
+		s, e := a.session()
+
+		if e != nil {
+			cumulus.HandleError(ctx, errors.Wrap(e, "Error getting session"))
+			close(results)
+			return
+		}
+
+		svc := sts.New(s)
+
+		start := time.Now()
+		out, e := svc.GetCallerIdentity(&sts.GetCallerIdentityInput{})
+		CallTimer.Done(start)
+
+		if e != nil {
+			cumulus.HandleError(ctx, errors.Wrap(e, "Error calling STS"))
+			close(results)
+			return
+		}
+
+		log = log.With().Str("account_id", aws.StringValue(out.Account)).Logger()
+
+		log.Debug().Msg("Sending results")
+		results <- &accountInfo{
+			Account:                 a,
+			GetCallerIdentityOutput: out,
+			ctx:                     log.WithContext(ctx),
+		}
+
+		close(results)
+	}()
+
+	return results
+}
 
 func (a Account) VisitAccountInfo(ctx context.Context, visitor cumulus.AccountInfoVisitor) error {
 
@@ -27,6 +75,7 @@ func (a Account) VisitAccountInfo(ctx context.Context, visitor cumulus.AccountIn
 
 	return visitor(ctx, accountInfo{
 		Account:                 a,
+		ctx:                     ctx,
 		GetCallerIdentityOutput: out,
 	})
 }
@@ -34,6 +83,15 @@ func (a Account) VisitAccountInfo(ctx context.Context, visitor cumulus.AccountIn
 type accountInfo struct {
 	Account
 	*sts.GetCallerIdentityOutput
+	ctx context.Context
+}
+
+func (a accountInfo) Source() cumulus.Account {
+	return a.Account
+}
+
+func (a accountInfo) Ctx() context.Context {
+	return a.ctx
 }
 
 func (a accountInfo) Name() string {

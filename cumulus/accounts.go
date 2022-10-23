@@ -10,8 +10,6 @@ import (
 	"sync"
 )
 
-type Accounts []Account
-
 func (a Accounts) String() string {
 	s := make([]string, len(a))
 	for n, ac := range a {
@@ -38,52 +36,42 @@ func (a Accounts) InRegion(region ...string) RegionalAccounts {
 	return list
 }
 
-func (a Accounts) Unique() Accounts {
-	type combined struct {
-		Account
-		id string
+func (a Accounts) AccountInfos(ctx context.Context) chan AccountInfo {
+	var providers []Provider[AccountInfo]
+
+	for _, acct := range a {
+		providers = append(providers, acct.AccountInfos)
 	}
-	c := make(chan combined)
-	wg := sync.WaitGroup{}
 
-	wg.Add(1)
+	zerolog.Ctx(ctx).Debug().Msg("Collecting")
+	return collect(ctx, providers)
+}
 
-	go func() {
-		defer close(c)
-		log.Debug().Msg("Waiting on info channel close")
-		wg.Wait()
-	}()
+func (a Accounts) Unique(ctx context.Context) Accounts {
 
-	go func() {
-		defer wg.Done()
+	seen := make(map[string]bool)
+	var unique Accounts
 
-		a.VisitAccountInfo(context.Background(), func(ctx context.Context, info AccountInfo) error {
-			log.Ctx(ctx).Debug().Str("id", info.ID()).Msg("reporting information")
-			ra := AccountContext(ctx)
-			c <- combined{ra, info.ID()}
-			return nil
-		})
-	}()
+	log := zerolog.Ctx(ctx)
 
-	already := make(map[string]bool, len(a))
-	results := make(Accounts, 0)
+	log.Debug().Msg("finding unique accounts")
 
-	for i := range c {
-		if _, seen := already[i.id]; !seen {
-			already[i.id] = true
-			results = append(results, i.Account)
-			log.Debug().Str("id", i.id).Str("account", i.Account.Name()).Msg("using account")
+	for info := range a.AccountInfos(ctx) {
+		log.Debug().Msg("checking")
+		log := zerolog.Ctx(info.Ctx())
+		log.Debug().
+			Msg("Checking account")
+		if !seen[info.ID()] {
+			seen[info.ID()] = true
+			unique = append(unique, info.Source())
+			log.Debug().Str("id", info.ID()).Str("account", info.Source().Name()).Msg("using account")
 		} else {
-			log.Debug().Str("id", i.id).Str("account", i.Account.Name()).Msg("ignoring duplicate account")
+			log.Debug().Str("id", info.ID()).Str("account", info.Source().Name()).Msg("ignoring duplicate account")
 		}
 	}
 
-	log.Debug().Str("unique accounts", results.String()).Msg("Unique Accounts")
-
-	return results
+	return unique
 }
-
-type RegionalAccounts []RegionalAccount
 
 func (a Accounts) VisitAccountInfo(ctx context.Context, visitor AccountInfoVisitor) error {
 	wg := sync.WaitGroup{}
@@ -95,7 +83,7 @@ func (a Accounts) VisitAccountInfo(ctx context.Context, visitor AccountInfoVisit
 			logger := log.With().Str("account", acct.Name()).Logger()
 
 			go func(v VisitAccountInfoer, logger zerolog.Logger, acct Account) {
-				ctx := logger.WithContext(withAccountContext(ctx, acct))
+				//ctx := logger.WithContext(withAccountContext(ctx, acct))
 
 				defer wg.Done()
 				select {
@@ -145,7 +133,7 @@ func (a Accounts) VisitZones(ctx context.Context, visitor ZoneVisitor) error {
 			foundAny = true
 			go func(v VisitZoneser, logger zerolog.Logger, acct Account) {
 
-				ctx := logger.WithContext(withAccountContext(ctx, acct))
+				//ctx := logger.WithContext(withAccountContext(ctx, acct))
 
 				defer wg.Done()
 				select {

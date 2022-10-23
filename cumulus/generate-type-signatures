@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+open(FH, '>', "generated-signatures.go") or die $!;
+
+select FH;
+
+while(<>) {
+$package = $1 if /^package (\w+)/;
+
+last if $_ =~ /AUTO/;
+}
+
+print <<EOF;
+package $package
+import "context"
+
+// WARNING:  this file is generated. DO NOT EDIT.  Edit the source instead
+
+
+EOF
+
+while(<>) {
+    if (/^type *(\w+)/) {
+    $type = $1;
+    $ifname = interface_for($1);
+    $plural = plural($1);
+        print <<EOF;
+// ${ifname} marks a type that can provide a channel of ${type}
+type ${ifname} interface {
+  ${plural}(context.Context) chan ${1}
+}
+
+EOF
+    }
+}
+
+
+sub interface_for {
+    $type=$_[0];
+    if ($type =~ /e$/) {
+        return "${type}r"
+    } else {
+        return "${type}er"
+    }
+}
+
+sub plural {
+    return "${_[0]}s";
+}

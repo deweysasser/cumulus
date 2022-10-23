@@ -13,6 +13,51 @@ import (
 	"time"
 )
 
+func (a RegionalAccount) Instances(ctx context.Context) chan cumulus.Instance {
+
+	result := make(chan cumulus.Instance)
+
+	s, e := a.session()
+	if e != nil {
+		//return e
+		close(result)
+		return result
+	}
+
+	fmt.Sprint("Logger should print next")
+
+	svc := ec2.New(s)
+
+	a.Read.Wait(ctx)
+	start := time.Now()
+	instances, err := svc.DescribeInstancesWithContext(ctx, &ec2.DescribeInstancesInput{})
+	CallTimer.Done(start)
+
+	if err != nil {
+		//return e
+		close(result)
+		return result
+	}
+
+	go func() {
+		defer close(result)
+
+		for _, r := range instances.Reservations {
+			for _, i := range r.Instances {
+				select {
+				case <-ctx.Done():
+					return
+				default:
+					l := log.Ctx(ctx).With().Str("instance_id", aws.StringValue(i.InstanceId)).Logger()
+					ctx := l.WithContext(ctx)
+					result <- &instance{a, ctx, i}
+				}
+			}
+		}
+	}()
+	return result
+}
+
 func (a RegionalAccount) VisitInstance(ctx context.Context, cancel context.CancelFunc, visitor cumulus.InstanceVisitor) error {
 
 	s, e := a.session()
@@ -44,14 +89,25 @@ func (a RegionalAccount) VisitInstance(ctx context.Context, cancel context.Cance
 					visitor(
 						l.WithContext(ctx),
 						cancel,
-						instance{i}))
+						instance{a, ctx, i}))
 			}
 		}
 	}
 	return err
 }
 
-type instance struct{ *ec2.Instance }
+type instance struct {
+	account RegionalAccount
+	ctx     context.Context
+	*ec2.Instance
+}
+
+func (i instance) Ctx() context.Context {
+	return i.ctx
+}
+func (i instance) Source() cumulus.RegionalAccount {
+	return i.account
+}
 
 func (i instance) Id() cumulus.ID {
 	return cumulus.ID(aws.StringValue(i.InstanceId))

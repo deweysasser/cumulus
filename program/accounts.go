@@ -21,8 +21,11 @@ func (list *List) Run() error {
 		return err
 	}
 
-	return accounts.VisitAccountInfo(context.Background(), func(ctx context.Context, info cumulus.AccountInfo) error {
+	ctx := cumulus.WithErrorHandler(context.Background(), cumulus.IgnoreErrors)
+
+	for info := range accounts.AccountInfos(ctx) {
 		fmt.Println(info.Name(), "\t", info.ID())
-		return nil
-	})
+	}
+
+	return nil
 }
