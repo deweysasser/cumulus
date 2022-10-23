@@ -75,7 +75,15 @@ func (r resourceRecord) Text() string {
 		r.Zone.Id().String(),
 		r.Source(),
 	}, "\t")
+}
 
+func (r resourceRecord) Fields() cumulus.Fields {
+	return cumulus.NewBuilder().
+		LUID(aws.StringValue(r.ResourceRecordSet.Name)).
+		What("record_type", aws.StringValue(r.ResourceRecordSet.Type)).
+		Where("zone_id", r.Zone.Id().String()).
+		Where("account", r.Account.Name()).
+		Fields
 }
 
 func (r resourceRecord) Ctx() context.Context {

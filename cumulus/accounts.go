@@ -33,7 +33,8 @@ func (a Accounts) InRegion(region ...string) RegionalAccounts {
 }
 
 func (a Accounts) Unique(ctx context.Context) Accounts {
-
+	// TODO:  evaluate uniqueness in order so the set statys consistent with consistent order of the credentials file.
+	// Still do the lookup concurrently though.
 	seen := make(map[string]bool)
 	var unique Accounts
 

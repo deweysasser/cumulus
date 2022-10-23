@@ -109,3 +109,12 @@ func (a accountInfo) ID() string {
 func (a accountInfo) Text() string {
 	return a.Name()
 }
+
+func (a accountInfo) Fields() cumulus.Fields {
+	return cumulus.NewBuilder().
+		LUID(a.Name()).
+		WUID(aws.StringValue(a.Arn)).
+		Who("account_id", aws.StringValue(a.GetCallerIdentityOutput.Account)).
+		How("user_id", aws.StringValue(a.GetCallerIdentityOutput.UserId)).
+		Fields
+}

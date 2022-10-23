@@ -58,17 +58,22 @@ func doList[T cumulus.Common](list *CommonList, method func(account cumulus.Regi
 			if strings.Contains(s, list.Arg) {
 				logger := zerolog.Ctx(info.Ctx())
 				logger.Info().Msg("Found " + typename + " and exiting")
-				fmt.Println(info.Text())
+				//fmt.Println(info.Text())
+				fmt.Println(info.Fields().String())
 				cancel()
 			}
 		}
 		return errors.Error
 	} else {
 		log.Debug().Msg("Listing all " + typename)
+		acc := cumulus.NewAccumulator()
 		for info := range method(ra, ctx) {
 			count.Add(1)
-			fmt.Println(info.Text())
+			acc.Add(info.Fields())
+			//fmt.Println(info.Text())
+			//fmt.Println(info.Fields())
 		}
+		acc.Print()
 		return errors.Error
 	}
 
@@ -111,7 +116,7 @@ func doAccountList[T cumulus.Common](list *CommonList, method func(account cumul
 			if strings.Contains(s, list.Arg) {
 				logger := zerolog.Ctx(info.Ctx())
 				logger.Info().Msg("Found " + typename + " and exiting")
-				fmt.Println(info.Text())
+				fmt.Println(info.Fields().String())
 				cancel()
 			}
 		}

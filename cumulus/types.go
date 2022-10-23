@@ -43,6 +43,7 @@ type Texter interface {
 
 type Common interface {
 	Texter
+	Fields() Fields
 	Source() string
 	Ctx() context.Context
 	Text() string
