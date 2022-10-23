@@ -12,10 +12,6 @@ import (
 	"time"
 )
 
-type Texter interface {
-	Text() string
-}
-
 type CommonList struct {
 	CredentialsFile string   `group:"AWS" short:"c" help:"AWS Credentials File" type:"existingfile" default:"~/.aws/credentials"`
 	Include         []string `group:"Output" short:"I" help:"List of field regexps to include"`

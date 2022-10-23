@@ -81,10 +81,6 @@ func (a accountInfo) ID() string {
 	return aws.StringValue(a.GetCallerIdentityOutput.Account)
 }
 
-func (a accountInfo) Text() string {
-	return a.Name()
-}
-
 func (a accountInfo) GetFields(builder cumulus.IFieldBuilder) {
 	builder.
 		Name(a.Name()).

@@ -6,7 +6,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/deweysasser/cumulus/cumulus"
 	"github.com/rs/zerolog"
-	"strings"
 	"sync"
 	"time"
 )
@@ -66,14 +65,6 @@ type resourceRecord struct {
 	cumulus.Zone
 	context.Context
 	*route53.ResourceRecordSet
-}
-
-func (r resourceRecord) Text() string {
-	return strings.Join([]string{
-		aws.StringValue(r.ResourceRecordSet.Name),
-		aws.StringValue(r.ResourceRecordSet.Type),
-		r.Zone.Id().String(),
-	}, "\t")
 }
 
 func (r resourceRecord) GetFields(builder cumulus.IFieldBuilder) {

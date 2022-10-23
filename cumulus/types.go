@@ -11,8 +11,8 @@ import (
 
 // ErrorHandler is called by individual methods to handle and possibly abort processing
 type ErrorHandler func(ctx context.Context, err error)
-type Provider[T Texter] func(ctx context.Context) chan T
-type ProviderMethod[T Texter] func(p Provider[T], ctx context.Context) chan T
+type Provider[T Fielder] func(ctx context.Context) chan T
+type ProviderMethod[T Fielder] func(p Provider[T], ctx context.Context) chan T
 
 type ID string
 
@@ -38,10 +38,6 @@ type RegionalAccount interface {
 
 type RegionalAccounts []RegionalAccount
 
-type Texter interface {
-	Text() string
-}
-
 type Fielder interface {
 	GetFields(builder IFieldBuilder)
 }
@@ -51,10 +47,7 @@ type Sourcer interface {
 }
 
 type Common interface {
-	Texter
 	Fielder
 	Sourcer
 	Ctx() context.Context
-	Text() string
-	//JSON() string
 }

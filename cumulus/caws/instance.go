@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/deweysasser/cumulus/cumulus"
 	"github.com/rs/zerolog/log"
-	"strings"
 	"time"
 )
 
@@ -82,29 +81,6 @@ func (i instance) JSON() string {
 	}
 
 	return string(bytes)
-}
-
-func (i instance) Text() string {
-
-	name := ""
-	for _, t := range i.Tags {
-		if aws.StringValue(t.Key) == "Name" {
-			name = aws.StringValue(t.Value)
-			break
-		}
-	}
-
-	return strings.Join([]string{
-		fieldValue(i.InstanceId),
-		fieldValue(i.InstanceType),
-		fieldValue(i.PrivateDnsName),
-		fieldValue(i.PrivateIpAddress),
-		fieldValue(i.PublicDnsName),
-		fieldValue(i.PublicIpAddress),
-		name,
-	},
-		"\t",
-	)
 }
 
 func (i instance) GetFields(builder cumulus.IFieldBuilder) {

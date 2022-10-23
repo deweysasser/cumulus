@@ -8,7 +8,6 @@ import (
 	"github.com/deweysasser/cumulus/cumulus"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"strings"
 	"time"
 )
 
@@ -74,21 +73,6 @@ func (z zone) JSON() string {
 	}
 
 	return string(b)
-}
-
-func (z zone) Text() string {
-
-	zonetype := "public"
-
-	if aws.BoolValue(z.HostedZone.Config.PrivateZone) {
-		zonetype = "private"
-	}
-
-	return strings.Join([]string{
-		aws.StringValue(z.HostedZone.Id),
-		aws.StringValue(z.HostedZone.Name),
-		zonetype,
-	}, "\t")
 }
 
 func (z zone) GetFields(builder cumulus.IFieldBuilder) {

@@ -10,7 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/deweysasser/cumulus/cumulus"
 	"github.com/rs/zerolog/log"
-	"strings"
 	"time"
 )
 
@@ -105,27 +104,6 @@ func (i snapshot) JSON() string {
 	}
 
 	return string(bytes)
-}
-
-func (i snapshot) Text() string {
-
-	name := ""
-	for _, t := range i.Tags {
-		if aws.StringValue(t.Key) == "Name" {
-			name = aws.StringValue(t.Value)
-			break
-		}
-	}
-
-	return strings.Join([]string{
-		aws.StringValue(i.SnapshotId),
-		name,
-		fmt.Sprint(aws.Int64Value(i.Snapshot.VolumeSize), "G"),
-		fmt.Sprint(aws.TimeValue(i.Snapshot.StartTime)),
-		aws.StringValue(i.Description),
-	},
-		"\t",
-	)
 }
 
 func (i snapshot) GetFields(builder cumulus.IFieldBuilder) {
