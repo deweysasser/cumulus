@@ -25,7 +25,7 @@ type CommonList struct {
 	// TODO:  support a "fields" list to specify the membership and order of the fields printed
 }
 
-func Display[T cumulus.Common](list *CommonList, typename string, items chan T) {
+func Display[T cumulus.Common](options Options, list *CommonList, typename string, items chan T) {
 	var count atomic.Int32
 	defer func() {
 		log.Info().Int32("count", count.Load()).Msg("discovered " + typename)
@@ -34,7 +34,7 @@ func Display[T cumulus.Common](list *CommonList, typename string, items chan T) 
 	}()
 
 	var f *Filter
-	if list.IncludeAll {
+	if list.IncludeAll || options.Verbose {
 		log.Debug().Msg("Including all fields.  Removing filter")
 		f = NoFilter
 	} else {
@@ -46,10 +46,10 @@ func Display[T cumulus.Common](list *CommonList, typename string, items chan T) 
 		count.Add(1)
 		acc.Add(info)
 	}
-	acc.Print(f)
+	acc.Print(f, !options.Quiet)
 }
 
-func listOnRegionalAccounts[T cumulus.Common](list *CommonList, method func(account cumulus.RegionalAccounts, ctx context.Context) chan T, typename string) error {
+func listOnRegionalAccounts[T cumulus.Common](options Options, list *CommonList, method func(account cumulus.RegionalAccounts, ctx context.Context) chan T, typename string) error {
 	start := time.Now()
 	defer func() {
 		log.Info().Dur("duration", time.Since(start)).Msg("run time")
@@ -74,11 +74,11 @@ func listOnRegionalAccounts[T cumulus.Common](list *CommonList, method func(acco
 	log.Debug().Msg("Listing all " + typename)
 	items := method(ra, ctx)
 
-	Display(list, typename, items)
+	Display(options, list, typename, items)
 	return collectedErrors.Error
 }
 
-func listOnAccounts[T cumulus.Common](list *CommonList, method func(account cumulus.Accounts, ctx context.Context) chan T, typename string) error {
+func listOnAccounts[T cumulus.Common](options Options, list *CommonList, method func(account cumulus.Accounts, ctx context.Context) chan T, typename string) error {
 	start := time.Now()
 	defer func() {
 		log.Info().Dur("duration", time.Since(start)).Msg("run time")
@@ -105,6 +105,6 @@ func listOnAccounts[T cumulus.Common](list *CommonList, method func(account cumu
 
 	items := method(ra, ctx)
 
-	Display(list, typename, items)
+	Display(options, list, typename, items)
 	return errors.Error
 }

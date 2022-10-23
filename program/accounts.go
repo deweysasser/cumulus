@@ -12,8 +12,10 @@ type List struct {
 	CommonList
 }
 
-func (list *List) Run(program *Options) error {
-	return listOnAccounts[cumulus.AccountInfo](&list.CommonList,
+func (list *List) Run(program Options) error {
+	return listOnAccounts[cumulus.AccountInfo](
+		program,
+		&list.CommonList,
 		cumulus.Accounts.AccountInfos,
 		"AccountInfo")
 }

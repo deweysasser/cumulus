@@ -14,6 +14,7 @@ type InstanceList struct {
 
 func (list *InstanceList) Run(program Options) error {
 	return listOnRegionalAccounts[cumulus.Instance](
+		program,
 		&list.CommonList,
 		cumulus.RegionalAccounts.Instances,
 		"instance")

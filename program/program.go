@@ -21,10 +21,10 @@ type Options struct {
 	Snapshot Snapshots `cmd:""`
 	DNS      DNS       `cmd:""`
 
-	Debug        bool   `group:"Info" help:"Show debugging information"`
-	OutputFormat string `group:"Info" enum:"auto,jsonl,terminal" default:"auto" help:"How to show program output (auto|terminal|jsonl)"`
-	Quiet        bool   `group:"Info" help:"Be less verbose than usual"`
-	Verbose      bool   `group:"Info" help:"Be more verbose than usual"`
+	Debug        bool   `group:"Output" help:"Show debugging information"`
+	OutputFormat string `group:"Output" enum:"auto,jsonl,terminal" default:"auto" help:"How to show program output (auto|terminal|jsonl)"`
+	Quiet        bool   `group:"Output" short:"q" help:"Be less verbose than usual"`
+	Verbose      bool   `group:"Output" short:"v" help:"Be more verbose than usual"`
 }
 
 // Parse calls the CLI parsing routines

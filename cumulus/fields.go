@@ -118,7 +118,7 @@ func (acc *FieldsAccumulator) Fields() []FieldMeta {
 	return fields
 }
 
-func (acc *FieldsAccumulator) Print(f Filter) {
+func (acc *FieldsAccumulator) Print(f Filter, printTitles bool) {
 	padding := 3
 	fields := acc.Fields()
 	// TODO:  put the title in only when we're verbose
@@ -137,7 +137,9 @@ func (acc *FieldsAccumulator) Print(f Filter) {
 
 		acc.lengths[field.Name] = max(acc.lengths[field.Name], len(name))
 
-		fmt.Printf("%-*s", acc.lengths[field.Name]+padding, name)
+		if printTitles {
+			fmt.Printf("%-*s", acc.lengths[field.Name]+padding, name)
+		}
 	}
 	fmt.Println()
 

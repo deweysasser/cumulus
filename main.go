@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// This ends up calling options.Run()
-	if err := context.Run(); err != nil {
+	if err := context.Run(options); err != nil {
 		log.Err(err).Msg("Program failed")
 		os.Exit(1)
 	}
