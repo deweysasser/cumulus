@@ -7,17 +7,19 @@ import (
 )
 
 type Timer struct {
-	Name         string
-	count, total int
-	duration     time.Duration
-	c            chan time.Duration
+	Name                    string
+	count, totalCalls       int
+	duration, totalDuration time.Duration
+	periodStart             time.Time
+	c                       chan time.Duration
 }
 
 func NewTimer(ctx context.Context, name string) *Timer {
 	c := &Timer{
-		Name:  name,
-		count: 0,
-		c:     make(chan time.Duration, 100),
+		Name:        name,
+		count:       0,
+		periodStart: time.Now(),
+		c:           make(chan time.Duration, 100),
 	}
 
 	ticker := time.NewTicker(period)
@@ -29,12 +31,14 @@ func NewTimer(ctx context.Context, name string) *Timer {
 				return
 			case dur := <-c.c:
 				c.count++
-				c.total++
+				c.totalCalls++
+				c.totalDuration = c.totalDuration + dur
 				c.duration = c.duration + dur
 			case <-ticker.C:
 				c.Report()
 				c.count = 0
 				c.duration = 0
+				c.periodStart = time.Now()
 			}
 		}
 	}()
@@ -73,12 +77,19 @@ func (c *Timer) Report() {
 		Float64("rate", c.Rate()).
 		Dur("average_latency", c.AverageLatency()).
 		Int("count", c.count).
-		Int("Total", c.total).
-		Msg("counter")
+		Msg("timer")
+}
+
+func (c *Timer) Total() {
+	log.Info().
+		Str("name", c.Name).
+		Int("TotalCalls", c.totalCalls).
+		Dur("TotalDuration", c.totalDuration).
+		Msg("timer totals")
 }
 
 func (c Timer) Rate() float64 {
-	return float64(c.count) * float64(1*time.Second) / float64(period)
+	return float64(c.count) * float64(1*time.Second) / float64(time.Since(c.periodStart))
 }
 
 func (c Timer) AverageLatency() time.Duration {

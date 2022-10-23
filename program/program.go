@@ -18,6 +18,8 @@ type Options struct {
 
 	Account  Accounts  `cmd:""`
 	Instance Instances `cmd:""`
+	Snapshot Snapshots `cmd:""`
+	DNS      DNS       `cmd:""`
 
 	Debug        bool   `group:"Info" help:"Show debugging information"`
 	OutputFormat string `group:"Info" enum:"auto,jsonl,terminal" default:"auto" help:"How to show program output (auto|terminal|jsonl)"`

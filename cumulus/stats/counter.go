@@ -7,16 +7,18 @@ import (
 )
 
 type Counter struct {
-	Name         string
-	count, Total int
-	c            chan operation
+	Name              string
+	count, TotalCalls int
+	periodStart       time.Time
+	c                 chan operation
 }
 
 func NewCounter(ctx context.Context, name string) *Counter {
 	c := &Counter{
-		Name:  name,
-		count: 0,
-		c:     make(chan operation, 100),
+		Name:        name,
+		count:       0,
+		periodStart: time.Now(),
+		c:           make(chan operation, 100),
 	}
 
 	ticker := time.NewTicker(period)
@@ -28,10 +30,11 @@ func NewCounter(ctx context.Context, name string) *Counter {
 				return
 			case <-c.c:
 				c.count++
-				c.Total++
+				c.TotalCalls++
 			case <-ticker.C:
 				c.Report()
 				c.count = 0
+				c.periodStart = time.Now()
 			}
 		}
 	}()
@@ -47,8 +50,14 @@ func (c *Counter) Report() {
 		Str("name", c.Name).
 		Float64("rate", rate).
 		Int("count", c.count).
-		Int("Total", c.Total).
 		Msg("counter")
+}
+
+func (c *Counter) Total() {
+	log.Info().
+		Str("name", c.Name).
+		Int("TotalCalls", c.TotalCalls).
+		Msg("counter totals")
 }
 
 func (c *Counter) Inc() {
@@ -56,6 +65,5 @@ func (c *Counter) Inc() {
 }
 
 func (c Counter) Rate() float64 {
-	return float64(c.count) * float64(1*time.Second) / float64(period)
-
+	return float64(c.count) * float64(1*time.Second) / float64(time.Since(c.periodStart))
 }

@@ -9,60 +9,76 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/deweysasser/golang-program/cumulus"
-	"github.com/hashicorp/go-multierror"
 	"github.com/rs/zerolog/log"
 	"strings"
 	"time"
 )
 
-func (a RegionalAccount) VisitSnapshot(ctx context.Context, cancel context.CancelFunc, visitor cumulus.SnapshotVisitor) error {
+func (a RegionalAccount) Snapshots(ctx context.Context) chan cumulus.Snapshot {
+	results := make(chan cumulus.Snapshot)
 
 	s, e := a.session()
 	if e != nil {
-		return e
+		cumulus.HandleError(ctx, e)
+		close(results)
+		return results
 	}
-
-	fmt.Sprint("Logger should print next")
 
 	stssvc := sts.New(s)
 
 	a.Read.Wait(ctx)
 	start := time.Now()
-	out, err := stssvc.GetCallerIdentity(&sts.GetCallerIdentityInput{})
+	out, e := stssvc.GetCallerIdentity(&sts.GetCallerIdentityInput{})
 	CallTimer.Done(start)
 
-	if err != nil {
-		return e
+	if e != nil {
+		cumulus.HandleError(ctx, e)
+		close(results)
+		return results
 	}
 
 	svc := ec2.New(s)
 
-	a.Read.Wait(ctx)
+	go func() {
+		defer close(results)
 
-	start = time.Now()
-	snapshots, err := svc.DescribeSnapshotsWithContext(ctx, &ec2.DescribeSnapshotsInput{OwnerIds: []*string{out.Account}})
-	CallTimer.Done(start)
+		a.Read.Wait(ctx)
 
-	if err != nil {
-		return e
-	}
+		start = time.Now()
+		snapshots, err := svc.DescribeSnapshotsWithContext(ctx, &ec2.DescribeSnapshotsInput{OwnerIds: []*string{out.Account}})
+		CallTimer.Done(start)
 
-	for _, snap := range snapshots.Snapshots {
-		select {
-		case <-ctx.Done():
-			return err
-		default:
-			l := log.Ctx(ctx).With().Str("instance_id", aws.StringValue(snap.SnapshotId)).Logger()
-			err = multierror.Append(err, visitor(l.WithContext(ctx), cancel, snapshot{svc, snap, a}))
+		if err != nil {
+			cumulus.HandleError(ctx, e)
+			return
 		}
-	}
-	return err
+
+		for _, snap := range snapshots.Snapshots {
+			select {
+			case <-ctx.Done():
+				cumulus.HandleError(ctx, ctx.Err())
+				return
+			case results <- snapshot{ctx, svc, snap, a}:
+			}
+		}
+	}()
+
+	return results
 }
 
 type snapshot struct {
+	context.Context
 	*ec2.EC2
 	*ec2.Snapshot
 	RegionalAccount
+}
+
+func (i snapshot) Source() string {
+	return i.RegionalAccount.String()
+}
+
+func (i snapshot) Ctx() context.Context {
+	return i.Context
 }
 
 func (i snapshot) Delete(ctx context.Context, dryRun bool) error {

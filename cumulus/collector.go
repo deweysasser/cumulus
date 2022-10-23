@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-func collect[T any](ctx context.Context, from []Provider[T]) chan T {
+func collect[T Texter](ctx context.Context, from []Provider[T]) chan T {
 	c := make(chan T)
 
 	wg := sync.WaitGroup{}

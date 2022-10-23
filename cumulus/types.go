@@ -1,6 +1,8 @@
 package cumulus
 
-//go:generate ./generate-type-signatures types.go
+//go:generate ./generate-type-signatures regional_types.go nonregional_types.go
+//go:generate ./generate-account-wrappers RegionalAccounts generated-regional-accounts.go regional_types.go
+//go:generate ./generate-account-wrappers Accounts generated-accounts.go nonregional_types.go
 
 import (
 	"context"
@@ -9,9 +11,14 @@ import (
 
 // ErrorHandler is called by individual methods to handle and possibly abort processing
 type ErrorHandler func(ctx context.Context, err error)
-type Provider[T any] func(ctx context.Context) chan T
+type Provider[T Texter] func(ctx context.Context) chan T
+type ProviderMethod[T Texter] func(p Provider[T], ctx context.Context) chan T
 
 type ID string
+
+func (i ID) String() string {
+	return string(i)
+}
 
 type Account interface {
 	fmt.Stringer
@@ -30,31 +37,14 @@ type RegionalAccount interface {
 
 type RegionalAccounts []RegionalAccount
 
+type Texter interface {
+	Text() string
+}
+
 type Common interface {
-	Source() RegionalAccount
+	Texter
+	Source() string
 	Ctx() context.Context
-	//Logger() zerolog.Logger
-}
-
-// AUTOGENERATE below this line
-
-// AccountInfo gets details about a specific account
-type AccountInfo interface {
-	Source() Account
-	Ctx() context.Context
-	Name() string
-	ID() string
-}
-
-type Instance interface {
-	Common
-	Id() ID
-	JSON() string
 	Text() string
-}
-
-type Zone interface {
-	Id() ID
-	JSON() string
-	Text() string
+	//JSON() string
 }

@@ -3,48 +3,63 @@ package caws
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/deweysasser/golang-program/cumulus"
-	"github.com/hashicorp/go-multierror"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"strings"
 	"time"
 )
 
-func (a Account) VisitZones(ctx context.Context, cancel context.CancelFunc, visitor cumulus.ZoneVisitor) error {
+func (a Account) Zones(ctx context.Context) chan cumulus.Zone {
+	results := make(chan cumulus.Zone)
 
-	s, e := a.session()
-	if e != nil {
-		return e
-	}
-
-	fmt.Sprint("Logger should print next")
-
-	svc := route53.New(s)
-
-	start := time.Now()
-	zones, err := svc.ListHostedZonesWithContext(ctx, &route53.ListHostedZonesInput{})
-	CallTimer.Done(start)
-
-	if err != nil {
-		return e
-	}
-
-	for _, r := range zones.HostedZones {
-		select {
-		case <-ctx.Done():
-			return err
-		default:
-			err = multierror.Append(err, visitor(ctx, cancel, zone{r}))
+	go func() {
+		defer close(results)
+		s, e := a.session()
+		if e != nil {
+			cumulus.HandleError(ctx, e)
+			close(results)
 		}
-	}
-	return err
+
+		svc := route53.New(s)
+
+		// TODO:  put in API call limiter
+		start := time.Now()
+		zones, e := svc.ListHostedZonesWithContext(ctx, &route53.ListHostedZonesInput{})
+		CallTimer.Done(start)
+
+		if e != nil {
+			cumulus.HandleError(ctx, e)
+			close(results)
+		}
+
+		for _, r := range zones.HostedZones {
+			l := zerolog.Ctx(ctx).With().Str("zone_id", aws.StringValue(r.Id)).Logger()
+			select {
+			case <-ctx.Done():
+				return
+			case results <- zone{a, l.WithContext(ctx), r}:
+			}
+		}
+	}()
+
+	return results
 }
 
 type zone struct {
+	Account
+	context.Context
 	*route53.HostedZone
+}
+
+func (z zone) Source() string {
+	return z.Account.Name()
+}
+
+func (z zone) Ctx() context.Context {
+	return z.Context
 }
 
 func (z zone) Id() cumulus.ID {

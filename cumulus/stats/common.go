@@ -13,6 +13,7 @@ const (
 
 type Reporter interface {
 	Report()
+	Total()
 }
 
 var reportersChannel = make(chan Reporter)
@@ -29,5 +30,11 @@ func init() {
 func Report() {
 	for _, r := range reporters {
 		r.Report()
+	}
+}
+
+func Total() {
+	for _, r := range reporters {
+		r.Total()
 	}
 }

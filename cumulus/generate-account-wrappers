@@ -1,6 +1,11 @@
 #!/usr/bin/perl
 
-open(FH, '>', "generated-signatures.go") or die $!;
+$accountType = $ARGV[0];
+$file = $ARGV[1];
+shift @ARGV;
+shift @ARGV;
+
+open(FH, '>', $file) or die $!;
 
 select FH;
 
@@ -19,11 +24,19 @@ while(<>) {
     $ifname = interface_for($1);
     $plural = plural($1);
         print <<EOF;
-// ${ifname} marks a type that can provide a channel of ${type}
-type ${ifname} interface {
-  ${plural}(context.Context) chan ${1}
-}
 
+func (a $accountType) $plural(ctx context.Context) chan $type {
+	var providers []Provider[$type]
+
+	for _, acct := range a {
+
+		if v, ok := acct.($ifname); ok {
+			providers = append(providers, v.$plural)
+		}
+	}
+
+	return collect(ctx, providers)
+}
 EOF
     }
 }

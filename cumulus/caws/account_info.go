@@ -45,7 +45,7 @@ func (a Account) AccountInfos(ctx context.Context) chan cumulus.AccountInfo {
 
 		log.Debug().Msg("Sending results")
 		results <- &accountInfo{
-			Account:                 a,
+			account:                 a,
 			GetCallerIdentityOutput: out,
 			ctx:                     log.WithContext(ctx),
 		}
@@ -74,20 +74,24 @@ func (a Account) VisitAccountInfo(ctx context.Context, visitor cumulus.AccountIn
 	}
 
 	return visitor(ctx, accountInfo{
-		Account:                 a,
+		account:                 a,
 		ctx:                     ctx,
 		GetCallerIdentityOutput: out,
 	})
 }
 
 type accountInfo struct {
-	Account
+	account Account
 	*sts.GetCallerIdentityOutput
 	ctx context.Context
 }
 
-func (a accountInfo) Source() cumulus.Account {
-	return a.Account
+func (a accountInfo) Account() cumulus.Account {
+	return a.account
+}
+
+func (a accountInfo) Source() string {
+	return string(a.account)
 }
 
 func (a accountInfo) Ctx() context.Context {
@@ -95,9 +99,13 @@ func (a accountInfo) Ctx() context.Context {
 }
 
 func (a accountInfo) Name() string {
-	return string(a.Account)
+	return string(a.account)
 }
 
 func (a accountInfo) ID() string {
 	return aws.StringValue(a.GetCallerIdentityOutput.Account)
+}
+
+func (a accountInfo) Text() string {
+	return a.Name()
 }
