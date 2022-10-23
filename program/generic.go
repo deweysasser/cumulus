@@ -36,6 +36,9 @@ func doList[T cumulus.Common](list *CommonList, method func(account cumulus.Regi
 
 	ra := accounts.Unique(cumulus.WithErrorHandler(context.Background(), cumulus.IgnoreErrors)).InRegion(caws.DefaultRegions...)
 
+	errors := cumulus.ErrorCollector{}
+	ctx := cumulus.WithErrorHandler(context.Background(), errors.Handle)
+
 	log.Debug().Str("ras", fmt.Sprint(ra)).Msg("Using accounts")
 	var count atomic.Int32
 	defer func() {
@@ -46,7 +49,7 @@ func doList[T cumulus.Common](list *CommonList, method func(account cumulus.Regi
 
 	log.Debug().Str("arg", list.Arg).Msg("Searching for this IP")
 	if list.Arg != "" {
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
 		for info := range method(ra, ctx) {
@@ -59,14 +62,14 @@ func doList[T cumulus.Common](list *CommonList, method func(account cumulus.Regi
 				cancel()
 			}
 		}
-		return nil
+		return errors.Error
 	} else {
 		log.Debug().Msg("Listing all " + typename)
-		for info := range method(ra, context.Background()) {
+		for info := range method(ra, ctx) {
 			count.Add(1)
 			fmt.Println(info.Text())
 		}
-		return nil
+		return errors.Error
 	}
 
 }
@@ -86,6 +89,9 @@ func doAccountList[T cumulus.Common](list *CommonList, method func(account cumul
 
 	ra := accounts.Unique(cumulus.WithErrorHandler(context.Background(), cumulus.IgnoreErrors))
 
+	errors := cumulus.ErrorCollector{}
+	ctx := cumulus.WithErrorHandler(context.Background(), errors.Handle)
+
 	log.Debug().Str("ras", fmt.Sprint(ra)).Msg("Using accounts")
 	var count atomic.Int32
 	defer func() {
@@ -96,7 +102,7 @@ func doAccountList[T cumulus.Common](list *CommonList, method func(account cumul
 
 	log.Debug().Str("arg", list.Arg).Msg("Searching for this IP")
 	if list.Arg != "" {
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
 		for info := range method(ra, ctx) {
@@ -109,14 +115,13 @@ func doAccountList[T cumulus.Common](list *CommonList, method func(account cumul
 				cancel()
 			}
 		}
-		return nil
+		return errors.Error
 	} else {
 		log.Debug().Msg("Listing all " + typename)
-		for info := range method(ra, context.Background()) {
+		for info := range method(ra, ctx) {
 			count.Add(1)
 			fmt.Println(info.Text())
 		}
-		return nil
+		return errors.Error
 	}
-
 }

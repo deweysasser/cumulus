@@ -24,6 +24,7 @@ type Options struct {
 	Debug        bool   `group:"Info" help:"Show debugging information"`
 	OutputFormat string `group:"Info" enum:"auto,jsonl,terminal" default:"auto" help:"How to show program output (auto|terminal|jsonl)"`
 	Quiet        bool   `group:"Info" help:"Be less verbose than usual"`
+	Verbose      bool   `group:"Info" help:"Be more verbose than usual"`
 }
 
 // Parse calls the CLI parsing routines
@@ -61,10 +62,12 @@ func (program *Options) initLogging() {
 	switch {
 	case program.Debug:
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	case program.Quiet:
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	default:
+	case program.Verbose:
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case program.Quiet:
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	default:
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	}
 
 	var out io.Writer = os.Stdout
