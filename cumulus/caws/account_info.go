@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/deweysasser/golang-program/cumulus"
+	"github.com/deweysasser/cumulus/cumulus"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"time"

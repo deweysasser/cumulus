@@ -5,7 +5,7 @@ import (
 	// TODO:  move to AWS SDK for go v2
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/deweysasser/golang-program/cumulus"
+	"github.com/deweysasser/cumulus/cumulus"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/sasbury/mini"

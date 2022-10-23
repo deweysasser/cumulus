@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/deweysasser/golang-program/program"
+	"github.com/deweysasser/cumulus/program"
 	"github.com/rs/zerolog/log"
 	"os"
 )

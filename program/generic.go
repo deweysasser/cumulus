@@ -3,9 +3,9 @@ package program
 import (
 	"context"
 	"fmt"
-	"github.com/deweysasser/golang-program/cumulus"
-	"github.com/deweysasser/golang-program/cumulus/caws"
-	"github.com/deweysasser/golang-program/cumulus/stats"
+	"github.com/deweysasser/cumulus/cumulus"
+	"github.com/deweysasser/cumulus/cumulus/caws"
+	"github.com/deweysasser/cumulus/cumulus/stats"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"strings"

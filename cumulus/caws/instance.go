@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/deweysasser/golang-program/cumulus"
+	"github.com/deweysasser/cumulus/cumulus"
 	"github.com/hashicorp/go-multierror"
 	"github.com/rs/zerolog/log"
 	"strings"
@@ -111,6 +111,10 @@ func (i instance) Source() string {
 
 func (i instance) Id() cumulus.ID {
 	return cumulus.ID(aws.StringValue(i.InstanceId))
+}
+
+func (i instance) Fields() []cumulus.Field {
+	return []cumulus.Field{}
 }
 
 func (i instance) JSON() string {

@@ -1,4 +1,4 @@
-module github.com/deweysasser/golang-program
+module github.com/deweysasser/cumulus
 
 go 1.18
 

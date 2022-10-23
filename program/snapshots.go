@@ -1,7 +1,7 @@
 package program
 
 import (
-	"github.com/deweysasser/golang-program/cumulus"
+	"github.com/deweysasser/cumulus/cumulus"
 )
 
 type Snapshots struct {
