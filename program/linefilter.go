@@ -1,8 +1,10 @@
 package program
 
 import (
+	"fmt"
 	"github.com/deweysasser/cumulus/cumulus"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"regexp"
 	"strings"
 )
@@ -41,7 +43,7 @@ func ParseFilter(s string) (LineFilter, error) {
 	parts := strings.Split(s, ",")
 
 	for _, s1 := range parts {
-		f, e := NewExpression(strings.TrimSpace(s1))
+		f, e := ParseExpression(strings.TrimSpace(s1))
 		if e != nil {
 			return nil, e
 		}
@@ -59,10 +61,10 @@ func ParseFilter(s string) (LineFilter, error) {
 	}, nil
 }
 
-func NewExpression(expr string) (LineFilter, error) {
+func ParseExpression(expr string) (LineFilter, error) {
 	s := strings.Split(expr, "=")
 	if len(s) != 2 {
-		return nil, errors.New("Failed to split expression")
+		return nil, fmt.Errorf("Failed to split expression.  Expression has %d parts", len(s))
 	}
 
 	nrc, err := regexp.Compile(s[0])
@@ -76,9 +78,12 @@ func NewExpression(expr string) (LineFilter, error) {
 
 	return func(fields cumulus.Fields) bool {
 		for f, v := range fields {
-			if nrc.MatchString(f.Name) &&
-				vrc.MatchString(v.String()) {
-				return true
+			log.Debug().Str("field", f.Name).Str("value", v.String()).Msg("Evaluating expression against field")
+			if nrc.MatchString(f.Name) {
+				if vrc.MatchString(v.String()) {
+					log.Debug().Str("field", f.Name).Str("value", v.String()).Msg("Matches")
+					return true
+				}
 			}
 		}
 		return false

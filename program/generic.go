@@ -17,11 +17,12 @@ type CommonList struct {
 	Include         []string `group:"Output" short:"I" help:"List of field regexps to include"`
 	Exclude         []string `group:"Output" short:"X" help:"List of fields regexps to exclude"`
 	IncludeAll      bool     `group:"Output" short:"A" help:"Include all fields"`
+	ListExpression  []string `group:"Output" short:"l" help:"Expression to use to filter fields"`
 
 	// TODO:  support a "fields" list to specify the membership and order of the fields printed
 }
 
-func Display[T cumulus.Common](options Options, list *CommonList, typename string, items chan T) {
+func Display[T cumulus.Common](ctx context.Context, options Options, list *CommonList, typename string, items chan T) {
 	var count atomic.Int32
 	defer func() {
 		log.Info().Int32("count", count.Load()).Msg("discovered " + typename)
@@ -37,12 +38,23 @@ func Display[T cumulus.Common](options Options, list *CommonList, typename strin
 		f = NewFilter(list.Include, list.Exclude)
 	}
 
+	l := AcceptAllLines
+
+	if len(list.ListExpression) > 0 {
+		var e error
+		l, e = ParseFilters(list.ListExpression)
+		if e != nil {
+			cumulus.HandleError(ctx, e)
+			return
+		}
+	}
+
 	acc := cumulus.NewAccumulator()
 	for info := range items {
 		count.Add(1)
 		acc.Add(info)
 	}
-	acc.Print(f, !options.Quiet)
+	acc.Print(f, l, !options.Quiet)
 }
 
 func listOnRegionalAccounts[T cumulus.Common](options Options, list *CommonList, method func(account cumulus.RegionalAccounts, ctx context.Context) chan T, typename string) error {
@@ -70,7 +82,7 @@ func listOnRegionalAccounts[T cumulus.Common](options Options, list *CommonList,
 	log.Debug().Msg("Listing all " + typename)
 	items := method(ra, ctx)
 
-	Display(options, list, typename, items)
+	Display(ctx, options, list, typename, items)
 	return collectedErrors.Error
 }
 
@@ -93,14 +105,14 @@ func listOnAccounts[T cumulus.Common](options Options, list *CommonList, method 
 		return errors.New("No accounts discovered")
 	}
 
-	errors := cumulus.ErrorCollector{}
-	ctx := cumulus.WithErrorHandler(context.Background(), errors.Handle)
+	errorCollector := cumulus.ErrorCollector{}
+	ctx := cumulus.WithErrorHandler(context.Background(), errorCollector.Handle)
 
 	log.Debug().Str("ras", fmt.Sprint(ra)).Msg("Using accounts")
 	log.Debug().Msg("Listing all " + typename)
 
 	items := method(ra, ctx)
 
-	Display(options, list, typename, items)
-	return errors.Error
+	Display(ctx, options, list, typename, items)
+	return errorCollector.Error
 }

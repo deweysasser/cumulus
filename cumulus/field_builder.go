@@ -37,7 +37,7 @@ func (f *FieldBuilder) Add(meta FieldMeta, value string, options ...MetadataOpti
 	if v, ok := f.Fields[meta]; ok {
 		v.Add(value)
 	} else {
-		f.Fields[meta] = fValue(value)
+		f.Fields[meta] = NewFieldValue(value)
 	}
 
 	return f

@@ -67,7 +67,7 @@ func (f FieldValue) String() string {
 	return strings.Join(f.Values.ToSlice(), ", ")
 }
 
-func fValue(s string) *FieldValue {
+func NewFieldValue(s string) *FieldValue {
 	if s != "" {
 		return &FieldValue{Values: set.NewThreadUnsafeSet[string](s)}
 	} else {
@@ -118,7 +118,7 @@ func NewAccumulator() FieldsAccumulator {
 	}
 }
 
-type Filter interface {
+type FieldFilter interface {
 	Accept(meta FieldMeta) bool
 }
 
@@ -156,7 +156,9 @@ func (acc *FieldsAccumulator) Fields() []FieldMeta {
 	return fields
 }
 
-func (acc *FieldsAccumulator) Print(f Filter, printTitles bool) {
+type LineFilter func(fields Fields) bool
+
+func (acc *FieldsAccumulator) Print(f FieldFilter, l LineFilter, printTitles bool) {
 	padding := 3
 	fields := acc.Fields()
 	// TODO:  put the title in only when we're verbose
@@ -182,23 +184,25 @@ func (acc *FieldsAccumulator) Print(f Filter, printTitles bool) {
 	fmt.Println()
 
 	for _, line := range acc.Lines {
-		for _, field := range printFields {
+		if l(line) {
+			for _, field := range printFields {
 
-			s := ""
-			if v, ok := line[field]; ok {
-				s = v.String()
-			}
-			
-			switch {
-			case s == "":
-				s = "-"
-			case strings.Contains(s, " "):
-				s = "\"" + s + "\""
-			}
+				s := ""
+				if v, ok := line[field]; ok {
+					s = v.String()
+				}
 
-			fmt.Printf("%-*s", acc.lengths[field]+padding, s)
+				switch {
+				case s == "":
+					s = "-"
+				case strings.Contains(s, " "):
+					s = "\"" + s + "\""
+				}
+
+				fmt.Printf("%-*s", acc.lengths[field]+padding, s)
+			}
+			fmt.Println()
 		}
-		fmt.Println()
 	}
 }
 
