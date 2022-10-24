@@ -34,7 +34,7 @@ jobs:
       run: go test -v ./...
 
     - name: Build
-      run: make compile PROGRAM=output/${{steps.repo-name.outputs.name}}-${{env.GOOS}}-${{env.GOARCH}}${{matrix.ext}}
+      run: make package PROGRAM=bin/${{env.GOOS}}-${{env.GOARCH}}/${{steps.repo-name.outputs.name}}${{matrix.ext}} PACKAGE=dist/${{steps.repo-name.outputs.name}}-${{env.GOOS}}-${{env.GOARCH}}.zip
       env:
         GOOS: ${{matrix.GOOS}}
         GOARCH: ${{matrix.GOARCH}}
@@ -43,7 +43,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: artifacts
-        path: output
+        path: dist
         retention-days: 1
         if-no-files-found: error
 

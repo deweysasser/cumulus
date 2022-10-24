@@ -1,18 +1,23 @@
 
-ifeq ($(OS),Windows_NT)
+ifeq ($(shell go env GOOS),windows)
 EXE=.exe
 else
 EXE=
 endif
 
+DIST=dist
+BINDIR=.
+
 BASENAME=$(notdir $(shell pwd))
-PROGRAM=$(BASENAME)$(EXE)
+PROGRAM=$(BINDIR)/$(BASENAME)$(EXE)
 LAST_RELEASE=
 
 REPO=$(shell go list | head -n 1)
 IMAGE=$(BASENAME)
 VERSION ?= $(shell git describe --tags --always --dirty)
 DOCKER=docker
+PACKAGE=$(DIST)/$(basename $(notdir $(PROGRAM)))-$(shell go env GOOS)-$(shell go env GOARCH).zip
+
 
 .PHONY: $(PROGRAM)
 
@@ -20,8 +25,24 @@ all: $(PROGRAM)
 
 compile: $(PROGRAM)
 
-$(PROGRAM):
+$(PROGRAM): $(BINDIR)
+	mkdir -p $(dir $@)
 	go build -ldflags="-X '$(REPO)/program.Version=${VERSION}'" -o $(PROGRAM)
+
+package: $(PACKAGE)
+
+$(PACKAGE): $(PROGRAM)
+
+# These next 2 recipes know how to make .zip and .tar files, which are used implicitly in making the package
+%.zip:
+	mkdir $(dir $@)
+	zip -j $@ $?
+
+%.tar.gz %.tgz:
+	mkdir $(dir $@)
+	tar -czf $@ -C $(dir $<) $(notdir $<)
+
+
 
 install:
 	go install -ldflags="-X '$(REPO)/program.Version=${VERSION}'"

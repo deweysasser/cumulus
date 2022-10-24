@@ -16,3 +16,5 @@
 golang-program
 .idea
 CHANGELOG.md
+dist
+bin
