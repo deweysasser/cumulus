@@ -94,13 +94,7 @@ func (i instance) GetFields(builder cumulus.IFieldBuilder) {
 		Where("public_dns", aws.StringValue(i.PublicDnsName)).
 		Where("public_ip", aws.StringValue(i.PublicIpAddress))
 
-	for _, t := range i.Tags {
-		if aws.StringValue(t.Key) == "Name" {
-			builder.Name(aws.StringValue(t.Value))
-		} else {
-			builder.Tag(aws.StringValue(t.Key), aws.StringValue(t.Value))
-		}
-	}
+	tagFields(builder, i.Tags)
 
 	for _, inf := range i.NetworkInterfaces {
 		zerolog.Ctx(i.Ctx()).Debug().Msg("found additional network interface")
@@ -113,9 +107,12 @@ func (i instance) GetFields(builder cumulus.IFieldBuilder) {
 	}
 }
 
-func fieldValue(s *string) string {
-	if s == nil || *s == "" {
-		return "-"
+func tagFields(builder cumulus.IFieldBuilder, tags []*ec2.Tag) {
+	for _, t := range tags {
+		if aws.StringValue(t.Key) == "Name" {
+			builder.Name(aws.StringValue(t.Value))
+		} else {
+			builder.Tag(aws.StringValue(t.Key), aws.StringValue(t.Value))
+		}
 	}
-	return *s
 }

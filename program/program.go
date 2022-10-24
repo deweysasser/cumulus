@@ -16,10 +16,25 @@ type Options struct {
 	Version bool `help:"Show program version"`
 	// VersionCmd VersionCmd `name:"version" cmd:"" help:"show program version"`
 
-	Account  Accounts  `cmd:""`
-	Instance Instances `cmd:""`
-	Snapshot Snapshots `cmd:""`
-	DNS      DNS       `cmd:""`
+	Account  Accounts `cmd:""`
+	Instance struct {
+		List InstanceList `cmd:""`
+	} `cmd:""`
+	Snapshot struct {
+		List SnapshotList `cmd:""`
+	} `cmd:""`
+	MachineImage struct {
+		List MachineImageList `cmd:""`
+	} `cmd:"
+"`
+	DNS struct {
+		Zone struct {
+			List ZoneList `cmd:""`
+		} `cmd:""`
+		Record struct {
+			List RecordList `cmd:""`
+		} `cmd:""`
+	} `cmd:""`
 
 	Debug        bool   `group:"Output" help:"Show debugging information"`
 	OutputFormat string `group:"Output" enum:"auto,jsonl,terminal" default:"auto" help:"How to show program output (auto|terminal|jsonl)"`

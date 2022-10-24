@@ -12,3 +12,7 @@ type Snapshot interface {
 	Id() ID
 	Delete(ctx context.Context, dryRun bool) error
 }
+
+type MachineImage interface {
+	Common
+}

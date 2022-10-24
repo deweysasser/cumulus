@@ -29,3 +29,16 @@ func (a RegionalAccounts) Snapshots(ctx context.Context) chan Snapshot {
 
 	return collect(ctx, providers)
 }
+
+func (a RegionalAccounts) MachineImages(ctx context.Context) chan MachineImage {
+	var providers []Provider[MachineImage]
+
+	for _, acct := range a {
+
+		if v, ok := acct.(MachineImager); ok {
+			providers = append(providers, v.MachineImages)
+		}
+	}
+
+	return collect(ctx, providers)
+}

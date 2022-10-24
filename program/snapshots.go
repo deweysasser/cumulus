@@ -4,10 +4,6 @@ import (
 	"github.com/deweysasser/cumulus/cumulus"
 )
 
-type Snapshots struct {
-	List SnapshotList `cmd:""`
-}
-
 type SnapshotList struct {
 	CommonList `embed:""`
 }

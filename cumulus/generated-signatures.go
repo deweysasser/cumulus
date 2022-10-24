@@ -14,6 +14,11 @@ type Snapshoter interface {
 	Snapshots(context.Context) chan Snapshot
 }
 
+// MachineImager marks a type that can provide a channel of MachineImage
+type MachineImager interface {
+	MachineImages(context.Context) chan MachineImage
+}
+
 // AccountInfoer marks a type that can provide a channel of AccountInfo
 type AccountInfoer interface {
 	AccountInfos(context.Context) chan AccountInfo

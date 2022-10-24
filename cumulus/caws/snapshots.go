@@ -114,11 +114,5 @@ func (i snapshot) GetFields(builder cumulus.IFieldBuilder) {
 		When("start_time", aws.TimeValue(i.Snapshot.StartTime)).
 		Description(aws.StringValue(i.Description))
 
-	for _, t := range i.Tags {
-		if aws.StringValue(t.Key) == "Name" {
-			builder.Name(aws.StringValue(t.Value))
-		} else {
-			builder.Tag(aws.StringValue(t.Key), aws.StringValue(t.Value))
-		}
-	}
+	tagFields(builder, i.Tags)
 }
