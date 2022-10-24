@@ -98,8 +98,6 @@ func (i instance) GetFields(builder cumulus.IFieldBuilder) {
 
 	for _, inf := range i.NetworkInterfaces {
 		zerolog.Ctx(i.Ctx()).Debug().Msg("found additional network interface")
-		//builder.Where("private_dns", aws.StringValue(inf.PrivateDnsName))
-		//builder.Where("private_ip", aws.StringValue(inf.PrivateIpAddress))
 		for _, ip := range inf.PrivateIpAddresses {
 			builder.Where("private_dns_additional", aws.StringValue(ip.PrivateDnsName), cumulus.DefaultHidden)
 			builder.Where("private_ip_additional", aws.StringValue(ip.PrivateIpAddress), cumulus.DefaultHidden)

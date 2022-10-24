@@ -25,8 +25,11 @@ type Options struct {
 	} `cmd:""`
 	MachineImage struct {
 		List MachineImageList `cmd:""`
-	} `cmd:"
-"`
+	} `cmd:""`
+	Volume struct {
+		List VolumeList `cmd:""`
+	} `cmd:""`
+
 	DNS struct {
 		Zone struct {
 			List ZoneList `cmd:""`
@@ -40,6 +43,10 @@ type Options struct {
 	OutputFormat string `group:"Output" enum:"auto,jsonl,terminal" default:"auto" help:"How to show program output (auto|terminal|jsonl)"`
 	Quiet        bool   `group:"Output" short:"q" help:"Be less verbose than usual"`
 	Verbose      bool   `group:"Output" short:"v" help:"Be more verbose than usual"`
+	Profile      struct {
+		CPU    bool `group:"Profile" help:"profile the CPU"`
+		Memory bool `group:"Profile" help:"profile the Memory usage"`
+	} `embed:"" prefix:"profile."`
 }
 
 // Parse calls the CLI parsing routines

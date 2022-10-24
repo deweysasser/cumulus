@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/deweysasser/cumulus/program"
+	"github.com/pkg/profile"
 	"github.com/rs/zerolog/log"
 	"os"
 )
@@ -16,6 +17,13 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
+	}
+
+	switch {
+	case options.Profile.CPU:
+		defer profile.Start(profile.CPUProfile).Stop()
+	case options.Profile.Memory:
+		defer profile.Start(profile.MemProfile).Stop()
 	}
 
 	// This ends up calling options.Run()

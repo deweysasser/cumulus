@@ -19,6 +19,11 @@ type MachineImager interface {
 	MachineImages(context.Context) chan MachineImage
 }
 
+// Volumer marks a type that can provide a channel of Volume
+type Volumer interface {
+	Volumes(context.Context) chan Volume
+}
+
 // AccountInfoer marks a type that can provide a channel of AccountInfo
 type AccountInfoer interface {
 	AccountInfos(context.Context) chan AccountInfo

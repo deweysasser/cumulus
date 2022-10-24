@@ -16,3 +16,7 @@ type Snapshot interface {
 type MachineImage interface {
 	Common
 }
+
+type Volume interface {
+	Common
+}

@@ -42,3 +42,16 @@ func (a RegionalAccounts) MachineImages(ctx context.Context) chan MachineImage {
 
 	return collect(ctx, providers)
 }
+
+func (a RegionalAccounts) Volumes(ctx context.Context) chan Volume {
+	var providers []Provider[Volume]
+
+	for _, acct := range a {
+
+		if v, ok := acct.(Volumer); ok {
+			providers = append(providers, v.Volumes)
+		}
+	}
+
+	return collect(ctx, providers)
+}
