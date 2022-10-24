@@ -11,7 +11,7 @@ import (
 
 // ErrorHandler is called by individual methods to handle and possibly abort processing
 type ErrorHandler func(ctx context.Context, err error)
-type Provider[T Fielder] func(ctx context.Context) chan T
+type Provider[T any] func(ctx context.Context) chan T
 type ProviderMethod[T Fielder] func(p Provider[T], ctx context.Context) chan T
 
 type ID string

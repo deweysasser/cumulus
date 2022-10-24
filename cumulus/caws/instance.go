@@ -3,7 +3,6 @@ package caws
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/deweysasser/cumulus/cumulus"
@@ -22,8 +21,6 @@ func (a RegionalAccount) Instances(ctx context.Context) chan cumulus.Instance {
 		close(result)
 		return result
 	}
-
-	fmt.Sprint("Logger should print next")
 
 	svc := ec2.New(s)
 
