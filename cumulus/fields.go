@@ -161,7 +161,6 @@ type LineFilter func(fields Fields) bool
 func (acc *FieldsAccumulator) Print(f FieldFilter, l LineFilter, printTitles bool) {
 	padding := 3
 	fields := acc.Fields()
-	// TODO:  put the title in only when we're verbose
 
 	printFields := make([]FieldMeta, 0)
 
