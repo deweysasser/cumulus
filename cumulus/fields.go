@@ -105,15 +105,15 @@ type Fields map[FieldMeta]*FieldValue
 //}
 
 type FieldsAccumulator struct {
-	Lines   []map[string]string
-	lengths map[string]int
+	Lines   []Fields
+	lengths map[FieldMeta]int
 	fields  set.Set[FieldMeta]
 }
 
 func NewAccumulator() FieldsAccumulator {
 	return FieldsAccumulator{
-		Lines:   make([]map[string]string, 0),
-		lengths: make(map[string]int),
+		Lines:   make([]Fields, 0),
+		lengths: make(map[FieldMeta]int),
 		fields:  set.NewSet[FieldMeta](),
 	}
 }
@@ -133,12 +133,12 @@ func (acc *FieldsAccumulator) Add(fielder Fielder) {
 
 	fields := b.Fields
 
-	m := make(map[string]string)
+	m := make(Fields)
 	for k, v := range fields {
 		acc.fields.Add(k)
 		s := v.String()
-		acc.lengths[k.Name] = max(acc.lengths[k.Name], len(s))
-		m[k.Name] = s
+		acc.lengths[k] = max(acc.lengths[k], len(s))
+		m[k] = v
 	}
 
 	acc.Lines = append(acc.Lines, m)
@@ -173,10 +173,10 @@ func (acc *FieldsAccumulator) Print(f Filter, printTitles bool) {
 
 		name := field.Name
 
-		acc.lengths[field.Name] = max(acc.lengths[field.Name], len(name))
+		acc.lengths[field] = max(acc.lengths[field], len(name))
 
 		if printTitles {
-			fmt.Printf("%-*s", acc.lengths[field.Name]+padding, name)
+			fmt.Printf("%-*s", acc.lengths[field]+padding, name)
 		}
 	}
 	fmt.Println()
@@ -184,7 +184,11 @@ func (acc *FieldsAccumulator) Print(f Filter, printTitles bool) {
 	for _, line := range acc.Lines {
 		for _, field := range printFields {
 
-			s := line[field.Name]
+			s := ""
+			if v, ok := line[field]; ok {
+				s = v.String()
+			}
+			
 			switch {
 			case s == "":
 				s = "-"
@@ -192,7 +196,7 @@ func (acc *FieldsAccumulator) Print(f Filter, printTitles bool) {
 				s = "\"" + s + "\""
 			}
 
-			fmt.Printf("%-*s", acc.lengths[field.Name]+padding, s)
+			fmt.Printf("%-*s", acc.lengths[field]+padding, s)
 		}
 		fmt.Println()
 	}
