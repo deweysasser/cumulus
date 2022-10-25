@@ -92,14 +92,14 @@ func (program *Options) initLogging() {
 		zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	}
 
-	var out io.Writer = os.Stdout
+	var out io.Writer = os.Stderr
 
 	if os.Getenv("TERM") == "" && runtime.GOOS == "windows" {
 		out = colorable.NewColorableStdout()
 	}
 
 	if program.OutputFormat == "terminal" ||
-		(program.OutputFormat == "auto" && isTerminal(os.Stdout)) {
+		(program.OutputFormat == "auto" && isTerminal(os.Stderr)) {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: out})
 	} else {
 		log.Logger = log.Output(out)
