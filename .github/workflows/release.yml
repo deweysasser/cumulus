@@ -19,31 +19,31 @@ jobs:
           - GOOS: windows
             ext: .exe
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GO_VERSION}}
 
     - name: Repo Name
       id: repo-name
-      run: echo ::set-output name=name::$(basename ${{github.repository}})
+      run: echo name=$(basename ${{github.repository}}) >> $GITHUB_OUTPUT
 
     - name: Test
       run: go test -v ./...
 
     - name: Build
-      run: make compile PROGRAM=output/${{steps.repo-name.outputs.name}}-${{env.GOOS}}-${{env.GOARCH}}${{matrix.ext}}
+      run: make package PROGRAM=bin/${{env.GOOS}}-${{env.GOARCH}}/${{steps.repo-name.outputs.name}}${{matrix.ext}} PACKAGE=dist/${{steps.repo-name.outputs.name}}-${{env.GOOS}}-${{env.GOARCH}}.zip
       env:
         GOOS: ${{matrix.GOOS}}
         GOARCH: ${{matrix.GOARCH}}
 
     - name: 'Upload Artifact'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: artifacts
-        path: output
+        path: dist
         retention-days: 1
         if-no-files-found: error
 
@@ -52,11 +52,11 @@ jobs:
     needs:
       - build
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Download Artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
 
     - name: Install ChangeLog generator
       run: |
@@ -72,7 +72,7 @@ jobs:
 
     - name: Generate Changelog for ${{ github.ref_name }}
       id: generate-changelog
-      run: PATH=${PATH}:. make CHANGELOG.md
+      run: PATH="${PATH}:." make CHANGELOG.md
 
     - name: Create Release
       id: create_release
@@ -87,17 +87,17 @@ jobs:
     name: Build the docker image
     steps:
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Docker Release to GHCR
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           push: true
@@ -111,7 +111,7 @@ jobs:
 # uncomment this if you're also using docker hub
 #      - name: Login to Docker Container Registry
 #        if: ${{ secrets.DOCKERHUB_TOKEN }}
-#        uses: docker/login-action@v1
+#        uses: docker/login-action@v2
 #        with:
 #          registry: ghcr.io
 #          username: ${{ github.repository_owner }}
