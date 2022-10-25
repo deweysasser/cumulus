@@ -16,10 +16,8 @@ type CommonList struct {
 	CredentialsFile string   `group:"AWS" short:"c" help:"AWS Credentials File" type:"existingfile" default:"~/.aws/credentials"`
 	Include         []string `group:"Output" short:"I" help:"List of field regexps to include"`
 	Exclude         []string `group:"Output" short:"X" help:"List of fields regexps to exclude"`
-	IncludeAll      bool     `group:"Output" short:"A" help:"Include all fields"`
-	ListExpression  []string `group:"Output" short:"l" sep:"|" help:"Expression to use to filter fields"`
-
-	// TODO:  support a "fields" list to specify the membership and order of the fields printed
+	IncludeAll      bool     `group:"Output" short:"A" help:"Include all fields in output.  This can get wide"`
+	ListExpression  []string `group:"Output" short:"l" sep:"|" help:"Expression to use to filter fields.  name=value pairs can be separated by commas for 'and', use multiple arguments to 'or' expressions.  Both names and values are regexps"`
 }
 
 func Display[T cumulus.Common](ctx context.Context, options Options, list *CommonList, typename string, items chan T) {

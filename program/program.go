@@ -13,7 +13,7 @@ import (
 
 // Options is the structure of program options
 type Options struct {
-	Version bool `help:"Show program version"`
+	Version version `cmd:"" help:"Show program version"`
 	// VersionCmd VersionCmd `name:"version" cmd:"" help:"show program version"`
 
 	Account  Accounts `cmd:""`
@@ -49,6 +49,13 @@ type Options struct {
 	} `embed:"" prefix:"profile."`
 }
 
+type version struct{}
+
+func (version version) Run() error {
+	fmt.Println(Version)
+	return nil
+}
+
 // Parse calls the CLI parsing routines
 func (program *Options) Parse(args []string) (*kong.Context, error) {
 	parser, err := kong.New(program,
@@ -76,10 +83,6 @@ func (program *Options) AfterApply() error {
 }
 
 func (program *Options) initLogging() {
-	if program.Version {
-		fmt.Println(Version)
-		os.Exit(0)
-	}
 
 	switch {
 	case program.Debug:
