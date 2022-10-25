@@ -17,7 +17,7 @@ type CommonList struct {
 	Include         []string `group:"Output" short:"I" help:"List of field regexps to include"`
 	Exclude         []string `group:"Output" short:"X" help:"List of fields regexps to exclude"`
 	IncludeAll      bool     `group:"Output" short:"A" help:"Include all fields"`
-	ListExpression  []string `group:"Output" short:"l" help:"Expression to use to filter fields"`
+	ListExpression  []string `group:"Output" short:"l" sep:"|" help:"Expression to use to filter fields"`
 
 	// TODO:  support a "fields" list to specify the membership and order of the fields printed
 }
