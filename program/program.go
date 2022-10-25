@@ -44,9 +44,9 @@ type Options struct {
 	Quiet        bool   `group:"Output" short:"q" help:"Be less verbose than usual"`
 	Verbose      bool   `group:"Output" short:"v" help:"Be more verbose than usual"`
 	Profile      struct {
-		CPU    bool `group:"Profile" help:"profile the CPU"`
-		Memory bool `group:"Profile" help:"profile the Memory usage"`
-	} `embed:"" prefix:"profile."`
+		CPU    bool `group:"Profile" help:"profile the CPU" hidden:""`
+		Memory bool `group:"Profile" help:"profile the Memory usage" hidden:""`
+	} `embed:"" prefix:"profile." hidden:""`
 }
 
 type version struct{}
