@@ -30,9 +30,11 @@ func ParseFilters(s []string) (LineFilter, error) {
 	return func(fields cumulus.Fields) bool {
 		for _, f := range filters {
 			if f(fields) {
+				log.Debug().Strs("filters", s).Bool("matches", true).Msg("display line")
 				return true
 			}
 		}
+		log.Debug().Strs("filters", s).Bool("matches", true).Msg("hide line")
 		return false
 	}, nil
 }
@@ -78,12 +80,23 @@ func ParseExpression(expr string) (LineFilter, error) {
 
 	return func(fields cumulus.Fields) bool {
 		for f, v := range fields {
-			log.Debug().Str("field", f.Name).Str("value", v.String()).Msg("Evaluating expression against field")
+			l := log.With().
+				Str("field", f.Name).
+				Str("value", v.String()).
+				Str("expression", expr).
+				Logger()
 			if nrc.MatchString(f.Name) {
 				if vrc.MatchString(v.String()) {
-					log.Debug().Str("field", f.Name).Str("value", v.String()).Msg("Matches")
+					l.Debug().
+						Bool("matches", true).
+						Msg("Matches")
 					return true
 				}
+			} else {
+				l.Debug().
+					Bool("matches", false).
+					Msg("Evaluating expression against field")
+
 			}
 		}
 		return false
