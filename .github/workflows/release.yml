@@ -80,7 +80,7 @@ jobs:
       with:
         files: ./artifacts/*
         body_path: ./CHANGELOG.md
-        draft: true
+        draft: false
 
   docker-build:
     runs-on: ubuntu-latest
