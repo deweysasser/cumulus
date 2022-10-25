@@ -1,6 +1,6 @@
 # cumulus
 
-A library and command line tool for concurrent bulk investigation and occational manipulation of
+A library and command line tool for concurrent bulk investigation and occasional manipulation of
 multiple clouds.
 
 # TL;DR
@@ -24,9 +24,9 @@ accounts/regions concurrently.
 
 Pick one:
 
+* MacOS: `brew install deweysasser/tap/Cumulus`
 * Pre-built binaries from [GitHub release page](https://github.com/deweysasser/cumulus/releases).
-* Homebrew recipe [coming soon](https://github.com/deweysasser/homebrew-tap) for this soon.
-* Other platforms (deb, rpm) as they are needed.
+* Other platforms (deb, rpm) TBD as I get a curiosity bump or someone needs them.
 * You can always `go install github.com/deweysasser/cumulus@latest` (currently the
 only thing you'll miss out on is the Makefile embedding version information in the binary.)
 
