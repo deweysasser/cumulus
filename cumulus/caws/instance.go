@@ -86,7 +86,7 @@ func (i instance) GetFields(builder cumulus.IFieldBuilder) {
 	builder.
 		GID(aws.StringValue(i.InstanceId)).
 		What("type", aws.StringValue(i.InstanceType)).
-		What("ami", aws.StringValue(i.ImageId)).
+		What("image_id", aws.StringValue(i.ImageId)).
 		Where("private_dns", aws.StringValue(i.PrivateDnsName)).
 		Where("private_ip", aws.StringValue(i.PrivateIpAddress)).
 		Where("public_dns", aws.StringValue(i.PublicDnsName)).
