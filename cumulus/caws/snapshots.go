@@ -3,7 +3,6 @@ package caws
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -68,7 +67,7 @@ func (a RegionalAccount) Snapshots(ctx context.Context) chan cumulus.Snapshot {
 type snapshot struct {
 	context.Context
 	*ec2.EC2
-	*ec2.Snapshot
+	obj *ec2.Snapshot
 	RegionalAccount
 }
 
@@ -84,7 +83,7 @@ func (i snapshot) Delete(ctx context.Context, dryRun bool) error {
 
 	defer CallTimer.Call().Done()
 	i.RegionalAccount.Modify.Wait(ctx)
-	_, err := i.EC2.DeleteSnapshotWithContext(ctx, &ec2.DeleteSnapshotInput{SnapshotId: i.SnapshotId, DryRun: aws.Bool(dryRun)})
+	_, err := i.EC2.DeleteSnapshotWithContext(ctx, &ec2.DeleteSnapshotInput{SnapshotId: i.obj.SnapshotId, DryRun: aws.Bool(dryRun)})
 	if ae, ok := err.(awserr.Error); ok {
 		if dryRun && ae.Code() == "DryRunOperation" {
 			return nil
@@ -94,7 +93,7 @@ func (i snapshot) Delete(ctx context.Context, dryRun bool) error {
 }
 
 func (i snapshot) Id() cumulus.ID {
-	return cumulus.ID(aws.StringValue(i.SnapshotId))
+	return cumulus.ID(aws.StringValue(i.obj.SnapshotId))
 }
 
 func (i snapshot) JSON() string {
@@ -108,11 +107,5 @@ func (i snapshot) JSON() string {
 
 func (i snapshot) GetFields(builder cumulus.IFieldBuilder) {
 
-	builder.
-		GID(aws.StringValue(i.SnapshotId)).
-		What("size", fmt.Sprint(aws.Int64Value(i.Snapshot.VolumeSize), "G")).
-		When("start_time", aws.TimeValue(i.Snapshot.StartTime)).
-		Description(aws.StringValue(i.Description))
-
-	tagFields(builder, i.Tags)
+	i.GeneratedFields(builder)
 }

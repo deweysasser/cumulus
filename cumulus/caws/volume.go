@@ -2,7 +2,6 @@ package caws
 
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/deweysasser/cumulus/cumulus"
@@ -59,7 +58,7 @@ func (a RegionalAccount) Volumes(ctx context.Context) chan cumulus.Volume {
 type volume struct {
 	RegionalAccount
 	context.Context
-	*ec2.Volume
+	obj *ec2.Volume
 }
 
 func (a volume) Ctx() context.Context {
@@ -68,17 +67,9 @@ func (a volume) Ctx() context.Context {
 
 func (a volume) GetFields(builder cumulus.IFieldBuilder) {
 
-	tagFields(builder, a.Tags)
+	a.GeneratedFields(builder)
 
-	builder.
-		GID(aws.StringValue(a.VolumeId)).
-		What("snapshot_id", aws.StringValue(a.Volume.SnapshotId)).
-		What("state", aws.StringValue(a.Volume.State)).
-		What("type", aws.StringValue(a.Volume.VolumeType)).
-		What("size", fmt.Sprintf("%dG", aws.Int64Value(a.Volume.Size))).
-		When("created", aws.TimeValue(a.Volume.CreateTime))
-
-	for _, a := range a.Volume.Attachments {
+	for _, a := range a.obj.Attachments {
 		builder.Where("attached_to", aws.StringValue(a.InstanceId))
 	}
 }

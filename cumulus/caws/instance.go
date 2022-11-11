@@ -57,7 +57,7 @@ func (a RegionalAccount) Instances(ctx context.Context) chan cumulus.Instance {
 type instance struct {
 	account RegionalAccount
 	ctx     context.Context
-	*ec2.Instance
+	obj     *ec2.Instance
 }
 
 func (i instance) Ctx() context.Context {
@@ -69,7 +69,7 @@ func (i instance) Source() cumulus.Fielder {
 }
 
 func (i instance) Id() cumulus.ID {
-	return cumulus.ID(aws.StringValue(i.InstanceId))
+	return cumulus.ID(aws.StringValue(i.obj.InstanceId))
 }
 
 func (i instance) JSON() string {
@@ -82,20 +82,12 @@ func (i instance) JSON() string {
 }
 
 func (i instance) GetFields(builder cumulus.IFieldBuilder) {
+	i.GeneratedFields(builder)
+}
 
-	builder.
-		GID(aws.StringValue(i.InstanceId)).
-		What("type", aws.StringValue(i.InstanceType)).
-		What("image_id", aws.StringValue(i.ImageId)).
-		Where("private_dns", aws.StringValue(i.PrivateDnsName)).
-		Where("private_ip", aws.StringValue(i.PrivateIpAddress)).
-		Where("public_dns", aws.StringValue(i.PublicDnsName)).
-		Where("public_ip", aws.StringValue(i.PublicIpAddress))
-
-	tagFields(builder, i.Tags)
-
-	for _, inf := range i.NetworkInterfaces {
-		zerolog.Ctx(i.Ctx()).Debug().Msg("found additional network interface")
+func addNetworkInterfaces(builder cumulus.IFieldBuilder, ctx context.Context, inf []*ec2.InstanceNetworkInterface) {
+	for _, inf := range inf {
+		zerolog.Ctx(ctx).Debug().Msg("found additional network interface")
 		for _, ip := range inf.PrivateIpAddresses {
 			builder.Where("private_dns_additional", aws.StringValue(ip.PrivateDnsName), cumulus.DefaultHidden)
 			builder.Where("private_ip_additional", aws.StringValue(ip.PrivateIpAddress), cumulus.DefaultHidden)
@@ -103,7 +95,7 @@ func (i instance) GetFields(builder cumulus.IFieldBuilder) {
 	}
 }
 
-func tagFields(builder cumulus.IFieldBuilder, tags []*ec2.Tag) {
+func ec2_Tag_to_fields(builder cumulus.IFieldBuilder, _ context.Context, tags []*ec2.Tag) {
 	for _, t := range tags {
 		if aws.StringValue(t.Key) == "Name" {
 			builder.Name(aws.StringValue(t.Value))

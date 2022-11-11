@@ -39,7 +39,7 @@ func (a Account) Zones(ctx context.Context) chan cumulus.Zone {
 			select {
 			case <-ctx.Done():
 				return
-			case results <- zone{a, l.WithContext(ctx), r}:
+			case results <- hostedzone{a, l.WithContext(ctx), r}:
 			}
 		}
 	}()
@@ -47,26 +47,26 @@ func (a Account) Zones(ctx context.Context) chan cumulus.Zone {
 	return results
 }
 
-type zone struct {
-	Account
+type hostedzone struct {
+	account Account
 	context.Context
-	*route53.HostedZone
+	obj *route53.HostedZone
 }
 
-func (z zone) Source() cumulus.Fielder {
-	return z.Account
+func (z hostedzone) Source() cumulus.Fielder {
+	return z.account
 }
 
-func (z zone) Ctx() context.Context {
+func (z hostedzone) Ctx() context.Context {
 	return z.Context
 }
 
-func (z zone) Id() cumulus.ID {
-	return cumulus.ID(aws.StringValue(z.HostedZone.Id))
+func (z hostedzone) Id() cumulus.ID {
+	return cumulus.ID(aws.StringValue(z.obj.Id))
 }
 
-func (z zone) JSON() string {
-	b, err := json.Marshal(z.HostedZone)
+func (z hostedzone) JSON() string {
+	b, err := json.Marshal(z.obj)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("Unable to marshal")
@@ -75,16 +75,12 @@ func (z zone) JSON() string {
 	return string(b)
 }
 
-func (z zone) GetFields(builder cumulus.IFieldBuilder) {
+func (z hostedzone) GetFields(builder cumulus.IFieldBuilder) {
 
-	if aws.BoolValue(z.HostedZone.Config.PrivateZone) {
+	z.GeneratedFields(builder)
+	if aws.BoolValue(z.obj.Config.PrivateZone) {
 		builder.What("type", "private")
 	} else {
 		builder.What("type", "public")
 	}
-
-	builder.
-		GID(aws.StringValue(z.HostedZone.Id)).
-		Name(aws.StringValue(z.HostedZone.Name)).
-		Done()
 }

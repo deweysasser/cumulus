@@ -91,7 +91,7 @@ func (a ami) GetFields(builder cumulus.IFieldBuilder) {
 		pub = "public"
 	}
 
-	tagFields(builder, a.Tags)
+	ec2_Tag_to_fields(builder, a.Context, a.Tags)
 
 	builder.
 		GID(aws.StringValue(a.ImageId)).

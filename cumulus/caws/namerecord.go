@@ -45,7 +45,7 @@ func (a Account) NameRecords(ctx context.Context) chan cumulus.NameRecord {
 				select {
 				case <-ctx.Done():
 					cumulus.HandleError(ctx, ctx.Err())
-				case results <- &resourceRecord{a, zone, l.WithContext(ctx), r}:
+				case results <- &resourcerecordset{a, zone, l.WithContext(ctx), r}:
 
 				}
 			}
@@ -60,30 +60,32 @@ func (a Account) NameRecords(ctx context.Context) chan cumulus.NameRecord {
 	return results
 }
 
-type resourceRecord struct {
+type resourcerecordset struct {
 	Account
 	cumulus.Zone
 	context.Context
-	*route53.ResourceRecordSet
+	obj *route53.ResourceRecordSet
 }
 
-func (r resourceRecord) GetFields(builder cumulus.IFieldBuilder) {
+func (r resourcerecordset) GetFields(builder cumulus.IFieldBuilder) {
+	r.GeneratedFields(builder)
 	builder.
-		Name(aws.StringValue(r.ResourceRecordSet.Name)).
-		What("record_type", aws.StringValue(r.ResourceRecordSet.Type)).
 		Where("zone_id", r.Zone.Id().String()).
-		Where("account", r.Account.Name()).
 		Done()
+
+	for _, record := range r.obj.ResourceRecords {
+		builder.What("record", aws.StringValue(record.Value), cumulus.DefaultHidden)
+	}
 }
 
-func (r resourceRecord) Ctx() context.Context {
+func (r resourcerecordset) Ctx() context.Context {
 	return r.Context
 }
 
-func (r resourceRecord) Source() cumulus.Fielder {
+func (r resourcerecordset) Source() cumulus.Fielder {
 	return r.Account
 }
 
-func (r resourceRecord) Id() cumulus.ID {
-	return cumulus.ID(aws.StringValue(r.ResourceRecordSet.Name))
+func (r resourcerecordset) Id() cumulus.ID {
+	return cumulus.ID(aws.StringValue(r.obj.Name))
 }
