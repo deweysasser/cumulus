@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+// GenerateFieldCode reads a YAML file and generates go-code to capture all the fields from an AWS data structure.
+// The YAML file was probably produced by generateYaml and then tweaked a bit.
+// It generates an instance method which can be called from the main GetFields method to avoid hand-codeing all the things.
+// TODO:  extends to delve into included structures & arrays
 func GenerateFieldCode(pkg string, file string) error {
 	target := strings.TrimSuffix(file, filepath.Ext(file)) + ".go"
 

@@ -9,5 +9,5 @@ func main() {
 
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 
-	code_generation.GenerateYaml()
+	code_generation.GenerateAllYaml()
 }

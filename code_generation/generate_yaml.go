@@ -21,13 +21,13 @@ var Generate = []interface{}{
 	ec2.Volume{},
 }
 
-func GenerateYaml() {
+func GenerateAllYaml() {
 	for _, g := range Generate {
-		generate(g)
+		generateYaml(g)
 	}
 }
 
-func generate(t interface{}) {
+func generateYaml(t interface{}) {
 	typ := reflect.TypeOf(t)
 
 	typeToken := strings.Replace(typ.String(), ".", "_", -1)
