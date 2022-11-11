@@ -31,7 +31,7 @@ jobs:
       run: echo name=$(basename ${{github.repository}}) >> $GITHUB_OUTPUT
 
     - name: Test
-      run: go test -v ./...
+      run: make test
 
     - name: Build
       run: make package PROGRAM=bin/${{env.GOOS}}-${{env.GOARCH}}/${{steps.repo-name.outputs.name}}${{matrix.ext}} PACKAGE=dist/${{steps.repo-name.outputs.name}}-${{env.GOOS}}-${{env.GOARCH}}.zip
