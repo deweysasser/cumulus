@@ -27,12 +27,12 @@ Pick one:
 * MacOS: `brew install deweysasser/tap/Cumulus`
 * Pre-built binaries from [GitHub release page](https://github.com/deweysasser/cumulus/releases).
 * Other platforms (deb, rpm) TBD as I get a curiosity bump or someone needs them.
-* You can always `go install github.com/deweysasser/cumulus@latest` (currently the
-only thing you'll miss out on is the Makefile embedding version information in the binary.)
+* You can always `go install github.com/deweysasser/cumulus@latest` (currently the only thing you'll
+  miss out on is the Makefile embedding version information in the binary.)
 
 # Running
 
-## Quickstart
+## Quick start
 
 There's nothing to set up. The command will pick up all your profiles from `~/.aws/credentials`,
 deduplicate them (i.e. you may have more than 1 pointing to an account -- it will take care of it),
@@ -41,7 +41,28 @@ and use them.
 If you use AWS creds in your environment -- file a bug and I'll make that work. It's not really
 important to me using multiple clouds.
 
+If you have `~/.aws.credentials` that you can use with the AWS CLI, try out `cumulus instance list`
+and go!
+
+## A quick tour
+
+```commandline
+cumulus (account|instance|snapshot|machine-image|volume|dns zone|dns record) list -I <column to include> -X <column to exclude> -l filter_column=value
+```
+
+All include, exclude, filter columns and filter values are regular expressions.
+
+For filters, using multiple filters on the command line (`... -l one=two -l three=four`) will select
+the UNION of objects matching the two filters, where using commas in a single filter
+expression (`...-l one=two,three=four`) will select the INTERSECTION of objects matching the
+individual filters.
+
+Use `--verbose` or `-v` to show all available column and run statistics. Use `--quiet` or `-q` to
+suppress the output of the column header row.
+
 ## Examples
+
+### List some instances
 
 ```commandline
  $ time bin/cumulus instance list > /dev/null
@@ -57,6 +78,8 @@ sys	    0m0.141s
 8:19PM INF timer totals TotalCalls=47 TotalDuration=9174.145546 name="AWS API calls"
 8:19PM INF run time duration=5484.798748
 ```
+
+### How many instances of each type are we using?
 
 ```commandline
 $ time ./bin/cumulus  instance list -I '^type$' -X . | sort | uniq -c | sort -rn 
@@ -74,7 +97,7 @@ sys	0m0.150s
 (Breakdown:  List the instances, include the field matching regexp `^type$` in output, exclude all
 other fields. You can figure out the rest of the pipeline.)
 
-Other possibilities:
+### Other possibilities
 
 ```commandline
 # Show the "environment" tag in a column
