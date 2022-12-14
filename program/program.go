@@ -39,6 +39,15 @@ type Options struct {
 		} `cmd:""`
 	} `cmd:""`
 
+	SNS struct {
+		Topic struct {
+			List TopicList `cmd:""`
+		} `cmd:""`
+		Subscription struct {
+			List SubscriptionList `cmd:""`
+		} `cmd:""`
+	} `cmd:""`
+
 	Debug        bool   `group:"Output" help:"Show debugging information"`
 	OutputFormat string `group:"Output" enum:"auto,jsonl,terminal" default:"auto" help:"How to show program output (auto|terminal|jsonl)"`
 	Quiet        bool   `group:"Output" short:"q" help:"Be less verbose than usual"`

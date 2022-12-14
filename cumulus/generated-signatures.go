@@ -24,6 +24,16 @@ type Volumer interface {
 	Volumes(context.Context) chan Volume
 }
 
+// Subscriptioner marks a type that can provide a channel of Subscription
+type Subscriptioner interface {
+	Subscriptions(context.Context) chan Subscription
+}
+
+// Topicer marks a type that can provide a channel of Topic
+type Topicer interface {
+	Topics(context.Context) chan Topic
+}
+
 // AccountInfoer marks a type that can provide a channel of AccountInfo
 type AccountInfoer interface {
 	AccountInfos(context.Context) chan AccountInfo

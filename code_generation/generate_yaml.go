@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/private/util"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/route53"
+	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/fatih/camelcase"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
@@ -19,6 +20,8 @@ var Generate = []interface{}{
 	route53.HostedZone{},
 	route53.ResourceRecordSet{},
 	ec2.Volume{},
+	sns.Topic{},
+	sns.Subscription{},
 }
 
 func GenerateAllYaml() {

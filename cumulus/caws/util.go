@@ -2,7 +2,7 @@ package caws
 
 import "fmt"
 
-//go:generate go run ../../build/generate.go caws ec2_Instance.yaml ec2_Snapshot.yaml ec2_Volume.yaml route53_HostedZone.yaml route53_ResourceRecordSet.yaml
+//go:generate go run ../../build/generate.go caws ec2_Instance.yaml ec2_Snapshot.yaml ec2_Volume.yaml route53_HostedZone.yaml route53_ResourceRecordSet.yaml sns_Topic.yaml sns_Subscription.yaml
 
 func boolToString(b *bool) string {
 	if b != nil && *b {

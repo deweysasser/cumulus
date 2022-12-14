@@ -1,0 +1,9 @@
+type: Topic
+fields:
+- name: topic_arn
+  type: string
+  awsname: TopicArn
+  category: What
+  converter: aws.StringValue
+  skip: false
+  show_by_default: true

@@ -1,0 +1,37 @@
+type: Subscription
+fields:
+- name: endpoint
+  type: string
+  awsname: Endpoint
+  category: What
+  converter: aws.StringValue
+  skip: false
+  show_by_default: true
+- name: owner
+  type: string
+  awsname: Owner
+  category: What
+  converter: aws.StringValue
+  skip: false
+  show_by_default: true
+- name: protocol
+  type: string
+  awsname: Protocol
+  category: What
+  converter: aws.StringValue
+  skip: false
+  show_by_default: true
+- name: subscription_arn
+  type: string
+  awsname: SubscriptionArn
+  category: What
+  converter: aws.StringValue
+  skip: false
+  show_by_default: true
+- name: topic_arn
+  type: string
+  awsname: TopicArn
+  category: What
+  converter: aws.StringValue
+  skip: false
+  show_by_default: true

@@ -55,3 +55,29 @@ func (a RegionalAccounts) Volumes(ctx context.Context) chan Volume {
 
 	return collect(ctx, providers)
 }
+
+func (a RegionalAccounts) Subscriptions(ctx context.Context) chan Subscription {
+	var providers []Provider[Subscription]
+
+	for _, acct := range a {
+
+		if v, ok := acct.(Subscriptioner); ok {
+			providers = append(providers, v.Subscriptions)
+		}
+	}
+
+	return collect(ctx, providers)
+}
+
+func (a RegionalAccounts) Topics(ctx context.Context) chan Topic {
+	var providers []Provider[Topic]
+
+	for _, acct := range a {
+
+		if v, ok := acct.(Topicer); ok {
+			providers = append(providers, v.Topics)
+		}
+	}
+
+	return collect(ctx, providers)
+}

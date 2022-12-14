@@ -20,3 +20,11 @@ type MachineImage interface {
 type Volume interface {
 	Common
 }
+
+type Subscription interface {
+	Common
+}
+
+type Topic interface {
+	Common
+}
