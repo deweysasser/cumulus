@@ -43,17 +43,19 @@ func (i instance) GeneratedFields(builder cumulus.IFieldBuilder) {
 	}
 
 	if i.obj.ImageId != nil {
-		builder.What("image_id", aws.StringValue(i.obj.ImageId))
+		builder.What("image_id", aws.StringValue(i.obj.ImageId), cumulus.DefaultHidden)
 	}
 
-	builder.GID(aws.StringValue(i.obj.InstanceId))
+	if i.obj.InstanceId != nil {
+		builder.What("instance_id", aws.StringValue(i.obj.InstanceId), cumulus.DefaultHidden)
+	}
 
 	if i.obj.InstanceLifecycle != nil {
 		builder.What("instance_lifecycle", aws.StringValue(i.obj.InstanceLifecycle), cumulus.DefaultHidden)
 	}
 
 	if i.obj.InstanceType != nil {
-		builder.What("instance_type", aws.StringValue(i.obj.InstanceType))
+		builder.What("instance_type", aws.StringValue(i.obj.InstanceType), cumulus.DefaultHidden)
 	}
 
 	if i.obj.Ipv6Address != nil {
@@ -85,19 +87,19 @@ func (i instance) GeneratedFields(builder cumulus.IFieldBuilder) {
 	}
 
 	if i.obj.PrivateDnsName != nil {
-		builder.Where("private_dns_name", aws.StringValue(i.obj.PrivateDnsName))
+		builder.What("private_dns_name", aws.StringValue(i.obj.PrivateDnsName), cumulus.DefaultHidden)
 	}
 
 	if i.obj.PrivateIpAddress != nil {
-		builder.Where("private_ip_address", aws.StringValue(i.obj.PrivateIpAddress))
+		builder.What("private_ip_address", aws.StringValue(i.obj.PrivateIpAddress), cumulus.DefaultHidden)
 	}
 
 	if i.obj.PublicDnsName != nil {
-		builder.Where("public_dns_name", aws.StringValue(i.obj.PublicDnsName))
+		builder.What("public_dns_name", aws.StringValue(i.obj.PublicDnsName), cumulus.DefaultHidden)
 	}
 
 	if i.obj.PublicIpAddress != nil {
-		builder.Where("public_ip_address", aws.StringValue(i.obj.PublicIpAddress))
+		builder.What("public_ip_address", aws.StringValue(i.obj.PublicIpAddress), cumulus.DefaultHidden)
 	}
 
 	if i.obj.RamdiskId != nil {

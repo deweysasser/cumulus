@@ -22,7 +22,9 @@ func (i resourcerecordset) GeneratedFields(builder cumulus.IFieldBuilder) {
 		builder.What("multi_value_answer", fmt.Sprint(boolToString(i.obj.MultiValueAnswer)), cumulus.DefaultHidden)
 	}
 
-	builder.Name(aws.StringValue(i.obj.Name))
+	if i.obj.Name != nil {
+		builder.What("name", aws.StringValue(i.obj.Name), cumulus.DefaultHidden)
+	}
 
 	if i.obj.Region != nil {
 		builder.What("region", aws.StringValue(i.obj.Region), cumulus.DefaultHidden)
@@ -41,7 +43,7 @@ func (i resourcerecordset) GeneratedFields(builder cumulus.IFieldBuilder) {
 	}
 
 	if i.obj.Type != nil {
-		builder.What("record_type", aws.StringValue(i.obj.Type))
+		builder.What("type", aws.StringValue(i.obj.Type), cumulus.DefaultHidden)
 	}
 
 	if i.obj.Weight != nil {

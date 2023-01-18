@@ -39,6 +39,11 @@ type DBClusterer interface {
 	DBClusters(context.Context) chan DBCluster
 }
 
+// DBInstancer marks a type that can provide a channel of DBInstance
+type DBInstancer interface {
+	DBInstances(context.Context) chan DBInstance
+}
+
 // AccountInfoer marks a type that can provide a channel of AccountInfo
 type AccountInfoer interface {
 	AccountInfos(context.Context) chan AccountInfo

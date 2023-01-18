@@ -117,14 +117,14 @@ fields:
   category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: instance_id
   type: string
   awsname: InstanceId
-  category: GID
+  category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: instance_lifecycle
   type: string
   awsname: InstanceLifecycle
@@ -138,7 +138,7 @@ fields:
   category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: ipv_6_address
   type: string
   awsname: Ipv6Address
@@ -229,10 +229,10 @@ fields:
 - name: private_dns_name
   type: string
   awsname: PrivateDnsName
-  category: Where
+  category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: private_dns_name_options
   type: PrivateDnsNameOptionsResponse
   awsname: PrivateDnsNameOptions
@@ -243,10 +243,10 @@ fields:
 - name: private_ip_address
   type: string
   awsname: PrivateIpAddress
-  category: Where
+  category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: product_codes
   awsname: ProductCodes
   category: What
@@ -255,17 +255,17 @@ fields:
 - name: public_dns_name
   type: string
   awsname: PublicDnsName
-  category: Where
+  category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: public_ip_address
   type: string
   awsname: PublicIpAddress
-  category: Where
+  category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: ramdisk_id
   type: string
   awsname: RamdiskId

@@ -24,6 +24,7 @@ var Generate = []interface{}{
 	sns.Topic{},
 	sns.Subscription{},
 	rds.DBCluster{},
+	rds.DBInstance{},
 }
 
 func GenerateAllYaml() {

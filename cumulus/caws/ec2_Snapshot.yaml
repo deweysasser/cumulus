@@ -15,10 +15,10 @@ fields:
 - name: description
   type: string
   awsname: Description
-  category: Description
+  category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: encrypted
   type: bool
   awsname: Encrypted
@@ -71,7 +71,7 @@ fields:
 - name: snapshot_id
   type: string
   awsname: SnapshotId
-  category: GID
+  category: What
   converter: aws.StringValue
   skip: false
   show_by_default: false
@@ -81,7 +81,7 @@ fields:
   category: When
   converter: aws.TimeValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: state
   type: string
   awsname: State
@@ -120,6 +120,6 @@ fields:
   type: int64
   awsname: VolumeSize
   category: What
-  converter: toSizeInG
+  converter: aws.Int64Value
   skip: false
-  show_by_default: true
+  show_by_default: false

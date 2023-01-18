@@ -43,6 +43,9 @@ type Options struct {
 		Cluster struct {
 			List ClusterList `cmd:""`
 		} `cmd:""`
+		Instance struct {
+			List DBInstanceList `cmd:""`
+		} `cmd:""`
 	} `cmd:""`
 
 	SNS struct {

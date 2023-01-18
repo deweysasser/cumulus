@@ -14,9 +14,13 @@ func (i hostedzone) GeneratedFields(builder cumulus.IFieldBuilder) {
 		builder.What("caller_reference", aws.StringValue(i.obj.CallerReference), cumulus.DefaultHidden)
 	}
 
-	builder.GID(aws.StringValue(i.obj.Id))
+	if i.obj.Id != nil {
+		builder.What("id", aws.StringValue(i.obj.Id), cumulus.DefaultHidden)
+	}
 
-	builder.Name(aws.StringValue(i.obj.Name))
+	if i.obj.Name != nil {
+		builder.What("name", aws.StringValue(i.obj.Name), cumulus.DefaultHidden)
+	}
 
 	if i.obj.ResourceRecordSetCount != nil {
 		builder.What("resource_record_set_count", fmt.Sprint(aws.Int64Value(i.obj.ResourceRecordSetCount)), cumulus.DefaultHidden)

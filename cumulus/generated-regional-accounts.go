@@ -94,3 +94,16 @@ func (a RegionalAccounts) DBClusters(ctx context.Context) chan DBCluster {
 
 	return collect(ctx, providers)
 }
+
+func (a RegionalAccounts) DBInstances(ctx context.Context) chan DBInstance {
+	var providers []Provider[DBInstance]
+
+	for _, acct := range a {
+
+		if v, ok := acct.(DBInstancer); ok {
+			providers = append(providers, v.DBInstances)
+		}
+	}
+
+	return collect(ctx, providers)
+}

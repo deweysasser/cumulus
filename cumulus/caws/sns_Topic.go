@@ -8,8 +8,9 @@ import (
 // Code generated. DO NOT EDIT.  Code generated from sns_Topic.yaml
 
 func (i topic) GeneratedFields(builder cumulus.IFieldBuilder) {
+
 	if i.obj.TopicArn != nil {
-		builder.What("topic_arn", aws.StringValue(i.obj.TopicArn))
+		builder.What("topic_arn", aws.StringValue(i.obj.TopicArn), cumulus.DefaultHidden)
 	}
 
 }

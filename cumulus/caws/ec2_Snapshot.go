@@ -14,7 +14,9 @@ func (i snapshot) GeneratedFields(builder cumulus.IFieldBuilder) {
 		builder.What("data_encryption_key_id", aws.StringValue(i.obj.DataEncryptionKeyId), cumulus.DefaultHidden)
 	}
 
-	builder.Description(aws.StringValue(i.obj.Description))
+	if i.obj.Description != nil {
+		builder.What("description", aws.StringValue(i.obj.Description), cumulus.DefaultHidden)
+	}
 
 	if i.obj.Encrypted != nil {
 		builder.What("encrypted", fmt.Sprint(boolToString(i.obj.Encrypted)), cumulus.DefaultHidden)
@@ -44,10 +46,12 @@ func (i snapshot) GeneratedFields(builder cumulus.IFieldBuilder) {
 		builder.When("restore_expiry_time", aws.TimeValue(i.obj.RestoreExpiryTime), cumulus.DefaultHidden)
 	}
 
-	builder.GID(aws.StringValue(i.obj.SnapshotId))
+	if i.obj.SnapshotId != nil {
+		builder.What("snapshot_id", aws.StringValue(i.obj.SnapshotId), cumulus.DefaultHidden)
+	}
 
 	if i.obj.StartTime != nil {
-		builder.When("start_time", aws.TimeValue(i.obj.StartTime))
+		builder.When("start_time", aws.TimeValue(i.obj.StartTime), cumulus.DefaultHidden)
 	}
 
 	if i.obj.State != nil {
@@ -69,7 +73,7 @@ func (i snapshot) GeneratedFields(builder cumulus.IFieldBuilder) {
 	}
 
 	if i.obj.VolumeSize != nil {
-		builder.What("volume_size", fmt.Sprint(toSizeInG(i.obj.VolumeSize)))
+		builder.What("volume_size", fmt.Sprint(aws.Int64Value(i.obj.VolumeSize)), cumulus.DefaultHidden)
 	}
 
 }

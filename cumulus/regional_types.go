@@ -32,3 +32,7 @@ type Topic interface {
 type DBCluster interface {
 	Common
 }
+
+type DBInstance interface {
+	Common
+}

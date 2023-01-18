@@ -50,10 +50,10 @@ fields:
 - name: name
   type: string
   awsname: Name
-  category: Name
+  category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: region
   type: string
   awsname: Region
@@ -87,13 +87,13 @@ fields:
   converter: aws.StringValue
   skip: false
   show_by_default: false
-- name: record_type
+- name: type
   type: string
   awsname: Type
   category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: weight
   type: int64
   awsname: Weight

@@ -15,7 +15,7 @@ func (i volume) GeneratedFields(builder cumulus.IFieldBuilder) {
 	}
 
 	if i.obj.CreateTime != nil {
-		builder.When("create_time", aws.TimeValue(i.obj.CreateTime))
+		builder.When("create_time", aws.TimeValue(i.obj.CreateTime), cumulus.DefaultHidden)
 	}
 
 	if i.obj.Encrypted != nil {
@@ -47,11 +47,11 @@ func (i volume) GeneratedFields(builder cumulus.IFieldBuilder) {
 	}
 
 	if i.obj.SnapshotId != nil {
-		builder.What("snapshot_id", aws.StringValue(i.obj.SnapshotId))
+		builder.What("snapshot_id", aws.StringValue(i.obj.SnapshotId), cumulus.DefaultHidden)
 	}
 
 	if i.obj.State != nil {
-		builder.What("state", aws.StringValue(i.obj.State))
+		builder.What("state", aws.StringValue(i.obj.State), cumulus.DefaultHidden)
 	}
 
 	ec2_Tag_to_fields(builder, i.Ctx(), i.obj.Tags)
@@ -60,10 +60,12 @@ func (i volume) GeneratedFields(builder cumulus.IFieldBuilder) {
 		builder.What("throughput", fmt.Sprint(aws.Int64Value(i.obj.Throughput)), cumulus.DefaultHidden)
 	}
 
-	builder.GID(aws.StringValue(i.obj.VolumeId))
+	if i.obj.VolumeId != nil {
+		builder.What("volume_id", aws.StringValue(i.obj.VolumeId), cumulus.DefaultHidden)
+	}
 
 	if i.obj.VolumeType != nil {
-		builder.What("volume_type", aws.StringValue(i.obj.VolumeType))
+		builder.What("volume_type", aws.StringValue(i.obj.VolumeType), cumulus.DefaultHidden)
 	}
 
 }

@@ -22,7 +22,7 @@ fields:
 - name: id
   type: string
   awsname: Id
-  category: GID
+  category: What
   converter: aws.StringValue
   skip: false
   show_by_default: false
@@ -36,10 +36,10 @@ fields:
 - name: name
   type: string
   awsname: Name
-  category: Name
+  category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: resource_record_set_count
   type: int64
   awsname: ResourceRecordSetCount

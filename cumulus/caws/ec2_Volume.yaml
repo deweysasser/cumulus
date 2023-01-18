@@ -23,7 +23,7 @@ fields:
   category: When
   converter: aws.TimeValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: encrypted
   type: bool
   awsname: Encrypted
@@ -79,14 +79,14 @@ fields:
   category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: state
   type: string
   awsname: State
   category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
 - name: tags
   awsname: Tags
   category: What
@@ -103,7 +103,7 @@ fields:
 - name: volume_id
   type: string
   awsname: VolumeId
-  category: GID
+  category: What
   converter: aws.StringValue
   skip: false
   show_by_default: false
@@ -113,4 +113,4 @@ fields:
   category: What
   converter: aws.StringValue
   skip: false
-  show_by_default: true
+  show_by_default: false
