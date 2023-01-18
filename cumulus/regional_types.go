@@ -28,3 +28,7 @@ type Subscription interface {
 type Topic interface {
 	Common
 }
+
+type DBCluster interface {
+	Common
+}

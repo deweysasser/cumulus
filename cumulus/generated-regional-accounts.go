@@ -81,3 +81,16 @@ func (a RegionalAccounts) Topics(ctx context.Context) chan Topic {
 
 	return collect(ctx, providers)
 }
+
+func (a RegionalAccounts) DBClusters(ctx context.Context) chan DBCluster {
+	var providers []Provider[DBCluster]
+
+	for _, acct := range a {
+
+		if v, ok := acct.(DBClusterer); ok {
+			providers = append(providers, v.DBClusters)
+		}
+	}
+
+	return collect(ctx, providers)
+}

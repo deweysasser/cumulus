@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/private/util"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/fatih/camelcase"
@@ -22,6 +23,7 @@ var Generate = []interface{}{
 	ec2.Volume{},
 	sns.Topic{},
 	sns.Subscription{},
+	rds.DBCluster{},
 }
 
 func GenerateAllYaml() {

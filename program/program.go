@@ -39,6 +39,12 @@ type Options struct {
 		} `cmd:""`
 	} `cmd:""`
 
+	RDS struct {
+		Cluster struct {
+			List ClusterList `cmd:""`
+		} `cmd:""`
+	} `cmd:""`
+
 	SNS struct {
 		Topic struct {
 			List TopicList `cmd:""`

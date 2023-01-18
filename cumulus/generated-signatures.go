@@ -34,6 +34,11 @@ type Topicer interface {
 	Topics(context.Context) chan Topic
 }
 
+// DBClusterer marks a type that can provide a channel of DBCluster
+type DBClusterer interface {
+	DBClusters(context.Context) chan DBCluster
+}
+
 // AccountInfoer marks a type that can provide a channel of AccountInfo
 type AccountInfoer interface {
 	AccountInfos(context.Context) chan AccountInfo
